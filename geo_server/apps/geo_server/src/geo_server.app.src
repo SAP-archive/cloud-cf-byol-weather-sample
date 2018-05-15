@@ -1,0 +1,8 @@
+{application, geo_server, [
+  {description, "Geographic Information Server"},
+  {vsn, "1.0.0"},
+  {registered, [country_manager]},
+  {applications, [kernel, stdlib, ibrowse, cowboy]},
+  {mod, {geo_server_app, []}},
+  {env, []}
+]}.

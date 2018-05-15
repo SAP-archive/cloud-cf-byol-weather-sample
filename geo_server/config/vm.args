@@ -1,0 +1,7 @@
+-sname geo_server
+
+-setcookie geo_server_cookie
+
++A30
++B
++K true

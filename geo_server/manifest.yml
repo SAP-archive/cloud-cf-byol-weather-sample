@@ -1,0 +1,12 @@
+---
+applications:
+- name:       geo-server
+  routes:
+  - route:    geo-server.cfapps.us10.hana.ondemand.com
+
+  path:       .
+  instances:  1
+  disk quota: 2048M
+  memory:     2048M
+
+

@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 1em 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.4em;
+  background: #FFFFEE;
+  color: #4d4d4d;
+  margin: 0 auto;
+
+  -webkit-font-smoothing: antialiased;
+     -moz-font-smoothing: antialiased;
+      -ms-font-smoothing: antialiased;
+       -o-font-smoothing: antialiased;
+          font-smoothing: antialiased;
+}
+
+#header {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.33em;
+}
+
+#server_status {
+  margin: 0.5em;
+  font-size: 1em;
+}
+
+#country_servers {
+  margin: 0.5em;
+}
+
+button {
+  margin: 0.33em;
+  font-size: 0.75em;
+  padding: 0.33em;
+  border-radius: 8px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid black;
+  padding: 0.33em;
+  vertical-align: center;
+}
+
+tr:nth-child(even) {background-color: #f8f8f8;}
