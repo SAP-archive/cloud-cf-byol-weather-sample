@@ -21,7 +21,6 @@
 
 %% Macro definitions
 -include("../include/macros/trace.hrl").
--include("../include/macros/now.hrl").
 
 %% Utilities
 -include("../include/utils/server_status.hrl").
@@ -100,32 +99,32 @@ wait_for_msgs(CountryServerList) ->
     {'EXIT', CountryServerPid, Reason} ->
       {NameOrPid, Status, Substatus} = case Reason of
         {stopped, DeadServerName} ->
-          io:format("Country server ~p was stopped~n", [DeadServerName]),
+          ?LOG("Country server ~p was stopped", [DeadServerName]),
           {DeadServerName, stopped, undefined};
 
         {no_cities, DeadServerName} ->
-          io:format("Country server ~p terminated: no_cities~n", [DeadServerName]),
+          ?LOG("Country server ~p terminated: no_cities", [DeadServerName]),
           {DeadServerName, stopped, no_cities};
 
         {country_file_error, Reason} ->
-          io:format("Error reading country file ~s~n", [Reason]),
+          ?LOG("Error reading country file ~s", [Reason]),
           {CountryServerPid, crashed, country_file_error};
 
         {fcp_country_file_error, Reason} ->
-          io:format("Error reading internal FCP file. ~p~n", [Reason]),
+          ?LOG("Error reading internal FCP file. ~p", [Reason]),
           {CountryServerPid, crashed, fcp_country_file_error};
 
         {country_zip_file_error, ZipFile, Reason} ->
-          io:format("Error unzipping file ~s: ~p~n", [ZipFile, Reason]),
+          ?LOG("Error unzipping file ~s: ~p", [ZipFile, Reason]),
           {CountryServerPid, crashed, country_zip_file_error};
 
         {retry_limit_exceeded, {CC, Ext}} ->
-          io:format("Retry limit exceeded attempting to download ~s~s~n", [CC, Ext]),
+          ?LOG("Retry limit exceeded attempting to download ~s~s", [CC, Ext]),
           {CountryServerPid, crashed, retry_limit_exceeded};
 
         {error, SomeReason} ->
           DeadServerName = get_server_name_from_pid(CountryServerPid, CountryServerList),
-          io:format("Country server ~p (~p) terminated for reason '~p'~n", [DeadServerName, CountryServerPid, SomeReason]),
+          ?LOG("Country server ~p (~p) terminated for reason '~p'", [DeadServerName, CountryServerPid, SomeReason]),
           {CountryServerPid, crashed, SomeReason}
       end,
       
@@ -221,7 +220,7 @@ wait_for_msgs(CountryServerList) ->
 
       case whereis(CountryServer) of
         undefined ->
-          io:format("~p not started~n",[CountryServer]),
+          ?LOG("~p not started",[CountryServer]),
           CountryServerList;
 
         _Pid ->
@@ -246,7 +245,7 @@ wait_for_msgs(CountryServerList) ->
           %% Did the server lookup work?
           case T of
             false ->
-              io:format("Error: Lookup of ~p in CountryServerList failed~n",[CountryServer]),
+              ?LOG("Error: Lookup of ~p in CountryServerList failed",[CountryServer]),
               {CountryServerList,
                #cmd_response{from_server = country_manager, cmd = start, status = error, reason = country_server_not_found}};
             _ ->

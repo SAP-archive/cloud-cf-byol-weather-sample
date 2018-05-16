@@ -16,7 +16,6 @@
 %% Macros
 -include("../include/macros/trace.hrl").
 -include("../include/macros/file_paths.hrl").
--include("../include/macros/now.hrl").
 
 %% =====================================================================================================================
 %%
@@ -144,8 +143,8 @@ wait_for_msg(CityServerList) ->
         trace_on   -> put(trace, true),  send_to_all(CityServerList, trace_on);
         trace_off  -> send_to_all(CityServerList, trace_off), put(trace, false);
 
-        child_list -> io:format("Country server ~s uses child processes~n~s~n",[get(cc), format_proc_list(CityServerList)]);
-        _          -> io:format("~s received unknown command ~p~n",[get(my_name), CmdOrQuery])
+        child_list -> ?LOG("Country server ~s uses child processes~n~s",[get(cc), format_proc_list(CityServerList)]);
+        _          -> ?LOG("~s received unknown command ~p",[get(my_name), CmdOrQuery])
       end,
       
       CityServerList;
@@ -156,7 +155,7 @@ wait_for_msg(CityServerList) ->
 
       case lists:keyfind(Id1, 4, CityServerList) of
         {pid, Pid, id, Id1} -> Pid ! {cmd, city_list};
-        _                   -> io:format("Country ~s has no cities starting with ~s~n",[get(cc), Id])
+        _                   -> ?LOG("Country ~s has no cities starting with ~s",[get(cc), Id])
       end,
 
       CityServerList;
@@ -264,7 +263,7 @@ handle_exit(SomePid, Reason, CityServerList) ->
 
           case Reason of
             normal -> ok;
-            _      -> io:format("City server ~p (~p) terminated with reason ~p~n", [CityServerId, SomePid, Reason])
+            _      -> ?LOG("City server ~p (~p) terminated with reason ~p", [CityServerId, SomePid, Reason])
           end,
     
           lists:keydelete(SomePid, 2, CityServerList)

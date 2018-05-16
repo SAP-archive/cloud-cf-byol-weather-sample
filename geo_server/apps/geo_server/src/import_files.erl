@@ -19,7 +19,6 @@
 %% Macros
 -include("../include/macros/trace.hrl").
 -include("../include/macros/file_paths.hrl").
--include("../include/macros/now.hrl").
 
 %% Files become stale after 24 hours
 -define(ONE_DAY,     60 * 60 * 24).
@@ -189,7 +188,7 @@ retry(RetryList, Ext, RetryCount) ->
   receive
     after ?RETRY_WAIT ->
       lists:foreach(fun({F,Ext1}) ->
-        io:format("~w~s retry attempt to download ~s~s~n",[RetryCount, format:as_ordinal(RetryCount), F, Ext1]),
+        ?LOG("~w~s retry attempt to download ~s~s",[RetryCount, format:as_ordinal(RetryCount), F, Ext1]),
         spawn(?MODULE, http_get_request, [Parent, F, Ext1])
       end,
       RetryList),
@@ -254,19 +253,19 @@ wait_for_resources(Count, Fun, RetryList) ->
       case SomeReason of
         {status_code, StatusCode} ->
           {_, Desc} = http_status_code(StatusCode),
-          io:format("HTTP ~w \"~s\": ~s~n", [StatusCode, Desc, ?GEONAMES_URL ++ Filename ++ Ext]);
+          ?LOG("HTTP ~w \"~s\": ~s", [StatusCode, Desc, ?GEONAMES_URL ++ Filename ++ Ext]);
 
         {other, req_timedout} ->
-          io:format("Error: Request timed out for ~s~s~n", [?GEONAMES_URL ++ Filename, Ext]);
+          ?LOG("Error: Request timed out for ~s~s", [?GEONAMES_URL ++ Filename, Ext]);
       
         {other, {conn_failed, {error, _Reason}}} ->
-          io:format("Error: Connection to ~s~s failed.  Host is down or unreachable.~n"
+          ?LOG("Error: Connection to ~s~s failed.  Host is down or unreachable.~n"
                     "       Possible causes:~n"
                     "         Proxy environment variables not set correctly?~n"
-                    "         Firewall rule denies the BEAM network access?~n", [?GEONAMES_URL ++ Filename, Ext]);
+                    "         Firewall rule denies the BEAM network access?", [?GEONAMES_URL ++ Filename, Ext]);
       
         {other, Reason} ->
-          io:format("Error: ~w requesting ~s~s~n", [Reason, ?GEONAMES_URL ++ Filename, Ext])
+          ?LOG("Error: ~w requesting ~s~s", [Reason, ?GEONAMES_URL ++ Filename, Ext])
       end,
 
       RetryList ++ [{Filename, Ext}]
@@ -330,7 +329,7 @@ get_etag([{_Hdr, _Val} | Rest]) -> get_etag(Rest).
 write_file(FQFilename, Content) ->
   case file:write_file(FQFilename, Content) of
     ok              -> ok;
-    {error, Reason} -> io:format("Writing file ~s failed. ~p~n",[FQFilename, Reason])
+    {error, Reason} -> ?LOG("Writing file ~s failed. ~p",[FQFilename, Reason])
   end.
 
 
@@ -345,7 +344,7 @@ move_file(Dir, Filename, Ext, From) ->
       ok;
 
     {error, Reason} ->
-      io:format("Copying file from ~s to ~s failed: ~p~n",[From, To, Reason])
+      ?LOG("Copying file from ~s to ~s failed: ~p",[From, To, Reason])
   end.
 
 %% ---------------------------------------------------------------------------------------------------------------------

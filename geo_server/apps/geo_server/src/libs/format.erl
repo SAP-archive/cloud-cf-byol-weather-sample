@@ -49,7 +49,7 @@ as_datetime({{YYYY,MM,DD},{H,M,S}}) ->
 %% Custom DateTime format with additional microseconds value
 as_datetime({{YYYY,MM,DD},{H,M,S,Micro}}) ->
   S1 = S + time:make_millis(Micro),
-  lists:flatten(io_lib:format("~w ~s ~s, ~2..0B:~2..0B:~6.3.0fs", [YYYY, month_name(MM), format_day(DD), H, M, S1])).
+  lists:flatten(io_lib:format("~w ~s ~s, ~2..0B:~2..0B:~6.3.0f", [YYYY, month_name(MM), format_day(DD), H, M, S1])).
 
 
 %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -38,8 +38,8 @@ wait_for_msg(ParentPid, Id, CityList) ->
     %% Process commands
     {cmd, Cmd} ->
       case Cmd of
-        city_list  -> io:format("~s~n", [lists:flatten([binary_to_list(C#geoname_int.name) ++ ", " || C <- CityList])]);
-        city_stats -> io:format("City process ~c (~p) holds ~w cities~n", [Id, self(), length(CityList)]);
+        city_list  -> ?LOG("~s", [lists:flatten([binary_to_list(C#geoname_int.name) ++ ", " || C <- CityList])]);
+        city_stats -> ?LOG("City process ~c (~p) holds ~w cities", [Id, self(), length(CityList)]);
         trace_on   -> put(trace, true);
         trace_off  -> put(trace, false);
         shutdown   -> exit(normal)

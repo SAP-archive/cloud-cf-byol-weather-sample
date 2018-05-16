@@ -70,13 +70,13 @@ start(_Type, _Args) ->
       {'EXIT', ChildPid, Reason} ->
         case Reason of
           {retry_limit_exceeded, RetryList} ->
-            io:format("Retry limit exceeded downloading ~p~n",[RetryList]);
+            ?LOG("Retry limit exceeded downloading ~p",[RetryList]);
 
           {parse_error, Reason} ->
-            io:format("Error ~p parsing countryInfo.txt~n",[Reason]);
+            ?LOG("Error ~p parsing countryInfo.txt",[Reason]);
 
           _ ->
-            io:format("Error ~p received from child proces ~p~n",[Reason, ChildPid])
+            ?LOG("Error ~p received from child process ~p",[Reason, ChildPid])
         end,
         
         exit({error, Reason});

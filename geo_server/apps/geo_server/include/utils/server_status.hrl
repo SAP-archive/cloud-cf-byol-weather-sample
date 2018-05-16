@@ -7,7 +7,7 @@
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Reset a crashed server back to its initial conditions
 reset_crashed_server(Rec) ->
-  io:format("Resetting crashed server ~p~n",[Rec#country_server.name]),
+  ?LOG("Resetting crashed server ~p",[Rec#country_server.name]),
 
   %% Ensure that the country server process really has terminated
   case whereis(Rec#country_server.name) of

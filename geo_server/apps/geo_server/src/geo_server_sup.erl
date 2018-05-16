@@ -70,7 +70,7 @@ stop(_State) ->
       exit(normal);
 
     SomeVal ->
-      io:format("geo_server supervisor received an unexpected message after issuing the 'terminate' command: ~p~n",[SomeVal]),
+      ?LOG("geo_server supervisor received an unexpected message after issuing the 'terminate' command: ~p",[SomeVal]),
       exit({supervisor_shutdown_error, SomeVal})
   end.
 
