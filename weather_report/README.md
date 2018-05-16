@@ -28,7 +28,7 @@ The data supplied by this server is derived from a variety of sources:
 
 ## But first, get yourself an API key...
 
-Before describing how you can implement this app, you ***must*** first register with [Open Weather Map](http://openweathermap.org) in order to obtain an [API Key](http://openweathermap.org/appid).
+Before describing how you can implement this app, you ***must*** first register with the [Open Weather Map](http://openweathermap.org) web site to obtain an [API Key](http://openweathermap.org/appid).
 
 You must then edit the file `index.html` and insert your API Key as the second parameter to the JavaScript function `Weather.mail()` on line 54.  Without this API Key, this app will be unable to obtain any weather information.
 

@@ -1,0 +1,45 @@
+# -----------------------------------------------------------------------------
+# Ignore patterns for MacOS system files
+# -----------------------------------------------------------------------------
+.DS_Store
+
+# -----------------------------------------------------------------------------
+# Ignore patterns for Scala/SBT projects
+# -----------------------------------------------------------------------------
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/project/target
+project/target
+.idea/
+.history
+.cache
+.lib/
+*.class
+*.log
+
+# -----------------------------------------------------------------------------
+# Ignore patterns for Erlang/Rebar3 projects
+# -----------------------------------------------------------------------------
+*.beam
+*.iml
+*.o
+*.plt
+*.swo
+*.swp
+.DS_Store
+.erlang.cookie
+.eunit
+.idea
+.rebar
+.rebar3
+ebin
+erl_crash.dump
+log
+logs
+rebar3.crashdump
+_build
+

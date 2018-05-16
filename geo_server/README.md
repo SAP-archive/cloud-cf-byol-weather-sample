@@ -78,25 +78,18 @@ The geographic and geopolitical data supplied by this server is obtained from [G
 
 # Installation
 
-## Clone Git Repository
-
-Clone this Git repository onto your local machine
-
-    $ git clone https://github.wdf.sap.corp/I003638/geo_server.git
-
-Then edit the `manifest.yml` file and change the `route` parameter to point to your own Cloud Foundry server.
-
-
 ##  Deploy to Cloud Foundry
+
+After cloning the entire repo (containing both the client- and server-side parts), open a command prompt and ensure you have changed into the repo's `geo_server` directory.
 
 Deploy to Cloud Foundry using the following community build pack for Erlang:
 
     $ cf push -b https://github.com/ChrisWhealy/cf-buildpack-erlang
 
 ***IMPORTANT***  
-For performance reasons, all the geographic information supplied by this server is held in memory; therefore, this app requires 2048Mb of memory.  The `geo-server` will probably not fully start if this memory allowance is reduced.
+For performance reasons, all the geographic information supplied by this server is held in memory; therefore, this app has been allocated 2048Mb of memory.
 
-Once all the country servers have fully started, the memory consumption drops to under 700Mb; however, if all the country servers are (re)started simultaneously, nearly the full 2Gb of memory could be required during the startup process.
+Once all the country servers have fully started, the memory consumption drops to under 700Mb; however, if all the country servers are (re)started simultaneously, nearly the full 2Gb of memory could be required.
 
 ##  Server Startup
 
@@ -140,6 +133,8 @@ The following startup sequence is performed for each country server:
 
 
 1. If you start a country server and find that it immediately stops with a substatus of `no_cities`, then this simply means this particular country contains no towns or cities with a population greater than the population limit (currently set to 500)
+
+1. It sometimes happens that the <http://geonames.org> server is under a heavy workload at the time you want to start the server.  If this is the case, then attempts to download the ZIP files for one or more countries might fail with the error message `retry_limit_exceeded`.  If this happens, it means that 3 separate attempts have been made to download that country's ZIP file - all of which have failed.  Here, you should reset the status of all the crashed servers using the toolbar button (which is only visible if one or more servers have crashed), then attempt to restart these servers.
 
 
 

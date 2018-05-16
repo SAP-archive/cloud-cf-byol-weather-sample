@@ -62,7 +62,7 @@ start(CountryList, {ProxyHost, ProxyPort}) ->
   %% The default sort order is by ascending continent name
   wait_for_msgs(lists:sort(
     fun(A,B) ->
-      %% Swap parameters around for sort ascending
+      %% Parameters A & B swapped around for sort ascending
       sort_servers_by(continent, B, A)
     end,
     initialise_country_server_list(CountryList))

@@ -260,7 +260,10 @@ wait_for_resources(Count, Fun, RetryList) ->
           io:format("Error: Request timed out for ~s~s~n", [?GEONAMES_URL ++ Filename, Ext]);
       
         {other, {conn_failed, {error, _Reason}}} ->
-          io:format("Error: Connection to ~s~s failed.  Host is down or unreachable.~n", [?GEONAMES_URL ++ Filename, Ext]);
+          io:format("Error: Connection to ~s~s failed.  Host is down or unreachable.~n"
+                    "       Possible causes:~n"
+                    "         Proxy environment variables not set correctly?~n"
+                    "         Firewall rule denies the BEAM network access?~n", [?GEONAMES_URL ++ Filename, Ext]);
       
         {other, Reason} ->
           io:format("Error: ~w requesting ~s~s~n", [Reason, ?GEONAMES_URL ++ Filename, Ext])
@@ -296,7 +299,7 @@ read_countries_file(IoDevice, DataLine, Acc) ->
   [[Char1 | _] | _] = LineTokens,
   read_countries_file(IoDevice, io:get_line(IoDevice,""), get_country_info(Char1, LineTokens, Acc)).
 
-%% Extract ISO country code, country name and continent code
+%% Extract the ISO country code, country name and continent code from the tokenised input
 %% These are the 1st, 5th and 9th columns of countryInfo.txt
 get_country_info($#,_Tokens, Acc) -> Acc;
 get_country_info(_,  Tokens, Acc) -> lists:append(Acc, [{lists:nth(1,Tokens)
@@ -425,7 +428,7 @@ read_country_file_int(CC, IoDevice, DataLine, {FeatureClassA, FeatureClassP}, Fi
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
-%% Send a message to the country_manager for each unit of progress
+%% Send a progress message to the country_manager after each progress step
 report_progress(Filesize, Stepsize, Linesize, Progress) ->
   Chunk = Linesize + Progress,
 
@@ -491,7 +494,7 @@ bin_or_undef(V)  -> list_to_binary(V).
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
-%% Filter out geoname records that not related to countries or administrative areas
+%% Filter out geoname records that don't related to countries or administrative areas
 keep_geoname_record(Rec) ->
   keep_feature_codes_for_class(Rec#geoname_int.feature_class, Rec, binary_to_integer(Rec#geoname_int.population)).
 
@@ -542,49 +545,35 @@ supplement_fcp_admin_text(HierarchyServer, FCP) ->
   wait_for_results(length(FCP), []).
 
 
-
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Wait for responses from country hierarchy server
 wait_for_results(0, Acc) -> Acc;
 wait_for_results(N, Acc) ->
   Acc1 = Acc ++ receive
-FCPRec when is_record(FCPRec, geoname_int) -> [FCPRec];
-_Whatever                                  -> []
-end,
+    FCPRec when is_record(FCPRec, geoname_int) -> [FCPRec];
+    _Whatever                                  -> []
+  end,
 
-wait_for_results(N-1, Acc1).
+  wait_for_results(N-1, Acc1).
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Define HTTP options
 define_http_options(CallerPid) ->
-  %% Ensure HTTP response is written directly to file
-  Options1 = [{save_response_to_file, true}],
+  [{save_response_to_file, true}]       ++         %% Ensure HTTP response is written directly to file
+  get_proxy_info(CallerPid, proxy_host) ++         %% The proxy host value must be a tuple of {proxy_host, HostName}
+  get_proxy_info(CallerPid, proxy_port).           %% The proxy port value must be a tuple of {proxy_port, PortNumber}
 
-  %% Get the proxy information from the process dictionary of the calling process
-  %%
-  %% The proxy host value must be a tuple of {proxy_host, HostName}
-  %% The proxy port value must be a tuple of {proxy_port, PortNumber}
-  Options2 = Options1 ++
-    case process_tools:read_process_dictionary(CallerPid, proxy_host) of
+%% ---------------------------------------------------------------------------------------------------------------------
+%% Fetch proxy information from the dictionary of the calling process
+get_proxy_info(CallerPid, Name) ->
+  case process_tools:read_process_dictionary(CallerPid, Name) of
       undefined -> [];
 
-      {proxy_host, ProxyHost} ->
-        case ProxyHost of
+      {Name, Value} ->
+        case Value of
           undefined -> [];
-          _         -> [{proxy_host, ProxyHost}]
+          _         -> [{Name, Value}]
         end
-    end,
+  end.
 
-  Options3 = Options2 ++
-    case process_tools:read_process_dictionary(CallerPid, proxy_port) of
-      undefined -> [];
-
-      {proxy_port, ProxyPort} ->
-        case ProxyPort of
-          undefined -> [];
-          _         -> [{proxy_port, ProxyPort}]
-        end
-    end,
-
-  Options3.

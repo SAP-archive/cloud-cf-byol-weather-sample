@@ -21,6 +21,17 @@ The client-side part is written in Scala and compiled to JavaScript using the [S
 
 Detailed documentation for Weather Report can be found [here](./weather_report/README.md).
 
+## Using Multi-Language Repository
+
+First of all, clone this repository into some suitable directory on your local machine.
+
+    $ git clone https://github.wdf.sap.corp/coolapps/WeatherDemo.git
+
+In your local clone directory, you will now have two subdirectories: `./geo_server` and `./weather_report`.  The former contains the server-side part of the app and the latter, the client-side part.
+
+Since these two parts of the application have been written in different languages and are designed to fulfil different roles, each part has its own specific deployment instructions.  Please refer to the README documents in these respective subdirectories to find the relevant deployment instructions.
+
+
 Authors
 -------
 
