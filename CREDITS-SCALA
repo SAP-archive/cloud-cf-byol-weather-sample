@@ -1,0 +1,26 @@
+This program references the following third party open source or other free download components.
+The third party licensors of these components may provide additional license rights,
+terms and conditions and/or require certain notices as described below.
+
+Scala (https://www.scala-lang.org/)
+Licensed under 3-Clause BSD License - https://opensource.org/licenses/BSD-3-Clause
+
+ScalaJS (https://www.scala-js.org/)
+Licensed under 3-Clause BSD License - https://opensource.org/licenses/BSD-3-Clause
+
+AkkaJS (https://www.akka-js.org/)
+Licensed under Scala License - https://www.scala-lang.org/license/
+
+Querki Jsext (https://mvnrepository.com/artifact/org.querki/querki-jsext)
+Licensed under 3-Clause BSD License - https://opensource.org/licenses/BSD-3-Clause
+
+Workbench (https://github.com/lihaoyi/workbench)
+Licensed under MIT License - https://opensource.org/licenses/MIT
+
+Leaflet (https://leafletjs.com)
+Licensed under 2-Clause BSD License - https://opensource.org/licenses/BSD-2-Clause
+
+Scala Java Locales (https://github.com/cquiroz/scala-java-locales)
+Licensed under 3-Clause BSD License - https://opensource.org/licenses/BSD-3-Clause
+
+
