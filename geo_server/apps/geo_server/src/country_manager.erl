@@ -10,7 +10,7 @@
   , start/2
 ]).
 
-%% Put -defines before -includes because COUNTRY_SERVER_NAME is needed in manage_server_status.hrl
+%% Put -defines before -includes because COUNTRY_SERVER_NAME is needed in server_status.hrl
 -define(COUNTRY_SERVER_NAME(CountryCode), list_to_atom("country_server_" ++ string:lowercase(CountryCode))).
 -define(RETRY_LIMIT, 3).
 -define(RETRY_WAIT,  5000).
