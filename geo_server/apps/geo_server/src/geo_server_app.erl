@@ -11,10 +11,12 @@
 	, stop/1
 ]).
 
--define(DEFAULT_HTTP_PORT, 8080).
-
+%% Macros
 -include("../include/macros/file_paths.hrl").
 -include("../include/macros/trace.hrl").
+
+-define(DEFAULT_HTTP_PORT, 8080).
+
 
 %% =====================================================================================================================
 %%

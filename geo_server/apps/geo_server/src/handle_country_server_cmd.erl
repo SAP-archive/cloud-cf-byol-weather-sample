@@ -17,7 +17,6 @@
 -include("../include/macros/trace.hrl").
 -include("../include/macros/default_http_response.hrl").
 
-
 -define(HTTP_GET, <<"GET">>).
 -define(COUNTRY_SERVER_NAME(CC), list_to_atom("country_server_" ++ string:lowercase(binary_to_list(CC)))).
 
@@ -62,7 +61,7 @@ init(Req=#{method := ?HTTP_GET}, State) ->
       json:record_to_json(cmd_response, CmdResp)
   end,
 
-  {ok, cowboy_req:reply(200, ?CONTENT_TYPE_JSON, JsonResp, Req), State};
+  {ok, cowboy_req:reply(200, ?CONTENT_TYPE_JSON, json:to_bin_string(JsonResp), Req), State};
 
 
 init(Req, State) ->

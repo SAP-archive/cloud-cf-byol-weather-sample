@@ -446,28 +446,28 @@ report_progress(Filesize, Stepsize, Linesize, Progress) ->
 %% Various fields are skipped to minimise the record size
 make_geoname_record([[]], _, Acc) -> Acc;
 
-%% #geoname.id             => #geoname_int.id
-%% #geoname.name           => #geoname_int.name
-%% #geoname.asciiname      => Don't care
-%% #geoname.alternatenames => Don't care
-%% #geoname.latitude       => #geoname_int.latitude
-%% #geoname.longitude      => #geoname_int.longitude
-%% #geoname.feature_class  => #geoname_int.feature_class
-%% #geoname.feature_code   => #geoname_int.feature_code
-%% #geoname.country_code   => #geoname_int.country_code
-%% #geoname.cc2            => Don't care
-%% #geoname.admin1         => #geoname_int.admin1
-%% #geoname.admin2         => #geoname_int.admin2
-%% #geoname.admin3         => #geoname_int.admin3
-%% #geoname.admin4         => #geoname_int.admin4
-%% #geoname.population     => #geoname_int.population
-%% #geoname.elevation      => Don't care
-%% #geoname.dem            => Don't care
-%% #geoname.timezone       => #geoname_int.timezone
-%% #geoname.modified       => Don't care
+%%  1 #geoname.id             => #geoname_int.id
+%%  2 #geoname.name           => #geoname_int.name
+%%  3 #geoname.asciiname      => Don't care
+%%  4 #geoname.alternatenames => Don't care
+%%  5 #geoname.latitude       => #geoname_int.latitude
+%%  6 #geoname.longitude      => #geoname_int.longitude
+%%  7 #geoname.feature_class  => #geoname_int.feature_class
+%%  8 #geoname.feature_code   => #geoname_int.feature_code
+%%  9 #geoname.country_code   => #geoname_int.country_code
+%% 10 #geoname.cc2            => Don't care
+%% 11 #geoname.admin1         => #geoname_int.admin1
+%% 12 #geoname.admin2         => #geoname_int.admin2
+%% 13 #geoname.admin3         => #geoname_int.admin3
+%% 14 #geoname.admin4         => #geoname_int.admin4
+%% 15 #geoname.population     => #geoname_int.population
+%% 16 #geoname.elevation      => Don't care
+%% 17 #geoname.dem            => Don't care
+%% 18 #geoname.timezone       => #geoname_int.timezone
+%% 19 #geoname.modified       => Don't care
 
-make_geoname_record([V  | Rest],  1, Acc) -> make_geoname_record(string:split(Rest,"\t"),  2, Acc#geoname_int{id   = bin_or_undef(V)});
-make_geoname_record([V  | Rest],  2, Acc) -> make_geoname_record(string:split(Rest,"\t"),  3, Acc#geoname_int{name = bin_or_undef(V)});
+make_geoname_record([V  | Rest],  1, Acc) -> make_geoname_record(string:split(Rest,"\t"),  2, Acc#geoname_int{id             = bin_or_undef(V)});
+make_geoname_record([V  | Rest],  2, Acc) -> make_geoname_record(string:split(Rest,"\t"),  3, Acc#geoname_int{name           = bin_or_undef(V)});
 make_geoname_record([_V | Rest],  3, Acc) -> make_geoname_record(string:split(Rest,"\t"),  4, Acc);
 make_geoname_record([_V | Rest],  4, Acc) -> make_geoname_record(string:split(Rest,"\t"),  5, Acc);
 make_geoname_record([V  | Rest],  5, Acc) -> make_geoname_record(string:split(Rest,"\t"),  6, Acc#geoname_int{latitude       = bin_or_undef(V)});
@@ -487,9 +487,10 @@ make_geoname_record([V  | Rest], 18, Acc) -> make_geoname_record(string:split(Re
 make_geoname_record([_V | Rest], 19, Acc) -> make_geoname_record(string:split(Rest,"\t"),  0, Acc).
 
 %% ---------------------------------------------------------------------------------------------------------------------
-%% Transform string data to binary for use in the geoname_int records
+%% Transform string data to a quoted binary string for use in the geoname_int records
 bin_or_undef([]) -> undefined;
-bin_or_undef(V)  -> list_to_binary(V).
+bin_or_undef(V)  -> format:as_quoted_str(V).
+
 
 
 %% ---------------------------------------------------------------------------------------------------------------------

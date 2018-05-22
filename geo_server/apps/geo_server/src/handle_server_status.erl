@@ -15,7 +15,6 @@
 %% Macros
 -include("../include/macros/default_http_response.hrl").
 
-
 -define(HTTP_GET, <<"GET">>).
 
 %% =====================================================================================================================
@@ -32,7 +31,7 @@ init(Req=#{method := ?HTTP_GET}, _State) ->
       server_status_details(ServerStatusList, Trace)
   end,
 
-  {ok, cowboy_req:reply(200, ?CONTENT_TYPE_JSON, ServerStatusDetails, Req), _State};
+  {ok, cowboy_req:reply(200, ?CONTENT_TYPE_JSON, json:to_bin_string(ServerStatusDetails), Req), _State};
 
 
 init(Req, _State) ->
@@ -45,14 +44,12 @@ init(Req, _State) ->
 %%
 %% =====================================================================================================================
 
-
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Format server status list
 server_status_details(ServerStatusList, Trace) ->
-  CountryManagerTrace = json:make_json_prop(country_manager_trace, Trace),
-  MemoryUsage         = json:make_json_prop(erlang_memory_usage,   format:as_binary_units(erlang:memory(total))),
+  CountryManagerTrace = json:property(country_manager_trace, Trace),
+  MemoryUsage         = json:property(erlang_memory_usage, format:as_binary_units(erlang:memory(total))),
+  JsonArray           = json:array([ json:record_to_json(country_server, S) || S <- ServerStatusList ]),
+  Servers             = json:property(servers, JsonArray),
 
-  Servers = json:make_json_prop(servers, json:make_json_array([ json:record_to_json(country_server, S) || S <- ServerStatusList ])),
-
-  json:make_json_obj([CountryManagerTrace, MemoryUsage, Servers]).
-
+  json:object([CountryManagerTrace, MemoryUsage, Servers]).

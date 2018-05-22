@@ -67,7 +67,7 @@ init(Req=#{method := ?HTTP_GET}, State) ->
         from_server = country_manager
       , cmd         = binary_to_atom(Cmd, utf8)
       , status      = ok
-      , payload     = json:make_json_array([ json:record_to_json(country_server, Svr) || Svr <- CountryServerList ])
+      , payload     = json:array([ json:record_to_json(country_server, Svr) || Svr <- CountryServerList ])
       },
       json:record_to_json(cmd_response, CmdResp);
 
@@ -83,7 +83,7 @@ init(Req=#{method := ?HTTP_GET}, State) ->
       json:record_to_json(cmd_response, CmdResp)
   end,
 
-  {ok, cowboy_req:reply(200, ?CONTENT_TYPE_JSON, JsonResp, Req), State};
+  {ok, cowboy_req:reply(200, ?CONTENT_TYPE_JSON, json:to_bin_string(JsonResp), Req), State};
 
 
 init(Req, State) ->
