@@ -28,7 +28,7 @@ The data supplied by this server is derived from a variety of sources:
 
 ## But first, get yourself an API key...
 
-Before describing how you can implement this app, you ***must*** first register with the [Open Weather Map](http://openweathermap.org) web site to obtain an [API Key](http://openweathermap.org/appid).
+Before describing how you can implement this app, you ***must*** first register with [Open Weather Map](http://openweathermap.org) in order to obtain an [API Key](http://openweathermap.org/appid).
 
 You must then edit the file `index.html` and insert your API Key as the second parameter to the JavaScript function `Weather.mail()` on line 54.  Without this API Key, this app will be unable to obtain any weather information.
 
@@ -92,6 +92,6 @@ Download the file `cf-weather-report.zip`, unzip it into some local directory, t
 
 This app is written in Scala using the [ScalaJS](https://www.scala-js.org/) and [Akka-Actor](https://akka.io/) frameworks.
 
-See the presentation [Using the Actor Model](./documentation/Using%20the%20Actor%20Model.ppsx) in the documentation folder for both an overview of the Actor Model design concept, and a description of this application's internal architecture.
-
-A running version of this app can be found deployed to my trial [Cloud Foundry](https://weather-report.cfapps.us10.hana.ondemand.com/) account.
+See the presentation [Using the Actor Model](./documentation/Using%20the%20Actor%20Model.ppsx) in the documentation folder for both an overview of the Actor Model design concept, and a description of the application's internal architecture.
+ 
+A running version of this app can be found deployed to my trial [Cloud Foundry](https://weather-report.cfapps.eu10.hana.ondemand.com/) account.

@@ -35,15 +35,16 @@ class City(cityInfo: js.Dynamic) extends Ordered[City] {
   }
 
   val name         = cityInfo.name.asInstanceOf[String].replaceAll("^\"|\"$", "")
-  val lat          = cityInfo.lat.asInstanceOf[Double]
-  val lng          = cityInfo.lng.asInstanceOf[Double]
-  val featureClass = cityInfo.featureClass.asInstanceOf[String]
-  val featureCode  = cityInfo.featureCode.asInstanceOf[String]
-  val countryCode  = cityInfo.countryCode.asInstanceOf[String]
+  val lat          = cityInfo.latitude.asInstanceOf[Double]
+  val lng          = cityInfo.longitude.asInstanceOf[Double]
+  val featureClass = cityInfo.feature_class.asInstanceOf[String]
+  val featureCode  = cityInfo.feature_code.asInstanceOf[String]
+  val countryCode  = cityInfo.country_code.asInstanceOf[String]
   val timezone     = cityInfo.timezone.asInstanceOf[String]
   val country      = CountryList.getName(this.countryCode)
-  val admin1Txt    = cityInfo.admin1Txt.asInstanceOf[String]
-  val admin2Txt    = cityInfo.admin2Txt.asInstanceOf[String]
-  val admin3Txt    = cityInfo.admin3Txt.asInstanceOf[String]
-  val admin4Txt    = cityInfo.admin4Txt.asInstanceOf[String]
+  val admin1Txt    = cityInfo.admin1_txt.asInstanceOf[String]
+  val admin2Txt    = cityInfo.admin2_txt.asInstanceOf[String]
+  val admin3Txt    = cityInfo.admin3_txt.asInstanceOf[String]
+  val admin4Txt    = cityInfo.admin4_txt.asInstanceOf[String]
 }
+

@@ -147,12 +147,11 @@ object DOMUtils {
   def createOption(city: City): Option = {
     var opt = createElement[Option]("option")
 
-    // The admin1 and admin2 text fields for a city might be occasionally be null
-    val admin1txt = if (city.admin1Txt == "null") "" else s", ${city.admin1Txt}"
-    val admin2txt = if (city.admin2Txt == "null") "" else s", ${city.admin2Txt}"
-    val admin3txt = if (city.admin3Txt == "null") "" else s", ${city.admin3Txt}"
-
-    opt.text = city.name + admin3txt + admin2txt + admin1txt
+    // The admin 1 2 and 3 text fields for a city could be null
+    opt.text = city.name +
+      (if (city.admin3Txt != null) s", ${city.admin3Txt}" else "") +
+      (if (city.admin2Txt != null) s", ${city.admin2Txt}" else "") +
+      (if (city.admin1Txt != null) s", ${city.admin1Txt}" else "")
 
     opt.setAttribute("lat", city.lat.toString)
     opt.setAttribute("lng", city.lng.toString)
@@ -160,8 +159,8 @@ object DOMUtils {
     opt.setAttribute("featureCode", city.featureCode)
     opt.setAttribute("iso2", city.countryCode)
     opt.setAttribute("city", city.name)
-    opt.setAttribute("admin1", admin1txt)
-    opt.setAttribute("admin2", admin2txt)
+    opt.setAttribute("admin1", if (city.admin1Txt == null) "" else city.admin1Txt)
+    opt.setAttribute("admin2", if (city.admin2Txt == null) "" else city.admin2Txt)
     opt.setAttribute("tz", city.timezone)
 
     opt

@@ -159,8 +159,8 @@ object Utils {
     weatherEndpoint + queryStr
   }
 
-//  private val geoserver_url = "http://localhost:8080/search"
-  private val geoserver_url = "https://geo-server.cfapps.us10.hana.ondemand.com/search"
+  private val geoserver_url = "http://localhost:8080/search"
+//  private val geoserver_url = "https://geo-server.cfapps.us10.hana.ondemand.com/search"
 
   def buildSearchUrl(search_term: String, whole_word: Boolean, starts_with: Boolean): String =
     s"$geoserver_url?search_term=$search_term&whole_word=$whole_word&starts_with=$starts_with"
