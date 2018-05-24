@@ -13,6 +13,9 @@
   , as_quoted_str/1
 ]).
 
+%% Macro definitions
+-include("../../include/macros/trace.hrl").
+
 %% Binary size values
 -define(KB, 1024).
 -define(MB, ?KB * 1024).

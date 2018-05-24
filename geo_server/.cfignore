@@ -1,0 +1,4 @@
+# Files to ignore during cf push
+.DS_STORE
+_build/*
+

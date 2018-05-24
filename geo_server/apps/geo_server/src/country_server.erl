@@ -43,7 +43,7 @@ start(CC, ServerName, Trace) ->
   put(cc, CC),
   put(city_count, unknown),
 
-  %% Trace flag supplied by the country manager
+  %% The value of the trace flag supplied from the server status record held by the country manager
   put(trace, Trace),
 
   %% Inform country manager that this server is starting up
@@ -289,7 +289,10 @@ distribute_cities([], CityServerList) -> CityServerList;
 
 %% Distribute FCP records amongst city servers based on the first character of the city name
 distribute_cities([FCP_Rec | Rest], CityServerList) ->
-  [Char1 | _] = string:uppercase(binary_to_list(FCP_Rec#geoname_int.name)),
+  [Char1 | _] = string:uppercase(case is_binary(FCP_Rec#geoname_int.name) of
+                  true  -> binary_to_list(FCP_Rec#geoname_int.name);
+                  false -> FCP_Rec#geoname_int.name
+                end),
 
   %% Extend CityServerList each time a city name starting with new letter of the alphabet is encountered
   NewCityServer = case lists:keyfind([Char1], 4, CityServerList) of

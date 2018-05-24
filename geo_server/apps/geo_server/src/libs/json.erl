@@ -44,7 +44,6 @@
 %%
 %% =====================================================================================================================
 
-
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Transform the cmd_response record
 %%
@@ -59,7 +58,7 @@ record_to_json(cmd_response, Rec) when is_record(Rec#cmd_response.payload, count
 %% It is assumed that if the payload field contains a list, that it can only be a list of country_server records
 record_to_json(cmd_response, Rec) when is_list(Rec#cmd_response.payload) ->
   record_to_json_int(cmd_response, Rec#cmd_response{
-    payload = array([ record_to_json_int(country_server, Svr) || Svr <- Rec#cmd_response.payload ])
+    payload = array([ record_to_json(country_server, Svr) || Svr <- Rec#cmd_response.payload ])
   });
 
 
@@ -72,8 +71,10 @@ record_to_json(cmd_response, Rec) ->
 %% Transform a country_server record into a JSON object
 record_to_json(country_server, Rec) when is_record(Rec, country_server) ->
   %% Format the Erlang date time field into a human readable form
+  %% The individual child server names are not needed, just how many there are
   record_to_json_int(country_server, Rec#country_server{
     started_at = format:as_datetime(Rec#country_server.started_at)
+  , children   = utils:length(Rec#country_server.children)
   });
 
 
@@ -87,11 +88,16 @@ record_to_json(geoname_int, Recs) when is_list(Recs)               -> array([rec
 %% Construct a JSON property record from a name/value pair
 %% The value passed to this function should be either:
 %%   * A simple value in binary form
-%%   * A JSON array
-%%   * A JSON object
+%%   * A tagged JSON array tuple
+%%   * A tagged JSON object tuple
 
-%% The property value is a tagged tuple representing another JavaScript entity
-property(PropName, T)       when is_tuple(T)       -> kv_to_json_property_rec(PropName, T);
+%% The property value is a some sort of tuple
+property(PropName, T) when is_tuple(T) ->
+  case T of
+    {json_object, _}    -> kv_to_json_property_rec(PropName, T);
+    {json_array, _}     -> kv_to_json_property_rec(PropName, T);
+    {{_,_,_},{_,_,_,_}} -> kv_to_json_property_rec(PropName, format:as_quoted_str(format:as_datetime(T)))
+  end;
 
 %% Specifically handle JavaScript reserved words.
 %% All other atoms are converted to quoted binary strings
@@ -151,9 +157,11 @@ to_bin_string({json_array, Elements}) ->
                 , comma_separate([to_bin_string(El) || El <- Elements])
                 , ?CLOSE_BRACKET]);
 
-to_bin_string({json_property, K, V}) -> list_to_binary([K, ?COLON, to_bin_string(V)]);
+to_bin_string({json_property, K, V}) ->
+  list_to_binary([K, ?COLON, to_bin_string(V)]);
 
-to_bin_string(Vals) when is_list(Vals) -> comma_separate([to_bin_string(Val) || Val <- Vals]);
+to_bin_string(Vals) when is_list(Vals) ->
+  comma_separate([to_bin_string(Val) || Val <- Vals]);
 
 to_bin_string(V) -> V.
 
@@ -186,7 +194,8 @@ object(Acc, [_ | Rest])                                  -> object(Acc, Rest).
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Create a json_property record from a key and a value
 %% Convert property names to a binary quoted string if they arrive as an atom
-%% The conversion of the property value to a binary (possibly quoted) string happens at the time the property is created
+%% The conversion of the property value to a binary (possibly quoted) string happens at the time the json_property is
+%% created
 kv_to_json_property_rec(K,V) when is_atom(K) -> #json_property{name = format:as_quoted_str(atom_to_list(K)), value = V};
 kv_to_json_property_rec(K,V)                 -> #json_property{name = format:as_quoted_str(K),               value = V}.
 

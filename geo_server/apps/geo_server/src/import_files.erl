@@ -19,6 +19,7 @@
 %% Macros
 -include("../include/macros/trace.hrl").
 -include("../include/macros/file_paths.hrl").
+-include("../include/macros/geoname_feature_codes.hrl").
 
 %% Files become stale after 24 hours
 -define(ONE_DAY,     60 * 60 * 24).
@@ -51,15 +52,9 @@
 %% Import the country info file to create a list of {country_code, country_name, continent}
 %% Send this list back to the top level application
 import_country_info(ApplicationPid, {ProxyHost, ProxyPort}) ->
-  %% Debug trace output
-  put(trace, true),
-
   %% Store proxy information in the process dictionary
   put(proxy_host, ProxyHost),
   put(proxy_port, ProxyPort),
-
-  {ok, PWD} = file:get_cwd(),
-  ?TRACE("Present working directory is ~s", [PWD]),
 
   %% Download the country info file
   spawn(?MODULE, http_get_request, [self(), "countryInfo", ".txt"]),
@@ -225,7 +220,7 @@ wait_for_resources(Count, zip)  -> wait_for_resources(Count, handle_zip_file, []
 wait_for_resources(0,    _Fun, RetryList) -> RetryList;
 wait_for_resources(Count, Fun, RetryList) ->
   RetryList1 = receive
-    %% New version of the file has been receievd
+    %% New version of the file has been received
     {ok, Filename, Ext, Etag, TempFilename} ->
       %% Each country file is written to its own directory
       TargetDir = ?TARGET_DIR ++ Filename ++ "/",
@@ -444,95 +439,80 @@ report_progress(Filesize, Stepsize, Linesize, Progress) ->
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Transform one line from a country file into a geoname record
 %% Various fields are skipped to minimise the record size
+%%
+%% Do not quote delimit the town/city name because then the search will fail.
+%% All other non-searchable string values should be quote delimited.
+%%
+%% Numeric values should not be quote delimited
+
 make_geoname_record([[]], _, Acc) -> Acc;
 
-%%  1 #geoname.id             => #geoname_int.id
-%%  2 #geoname.name           => #geoname_int.name
-%%  3 #geoname.asciiname      => Don't care
-%%  4 #geoname.alternatenames => Don't care
-%%  5 #geoname.latitude       => #geoname_int.latitude
-%%  6 #geoname.longitude      => #geoname_int.longitude
-%%  7 #geoname.feature_class  => #geoname_int.feature_class
-%%  8 #geoname.feature_code   => #geoname_int.feature_code
-%%  9 #geoname.country_code   => #geoname_int.country_code
-%% 10 #geoname.cc2            => Don't care
-%% 11 #geoname.admin1         => #geoname_int.admin1
-%% 12 #geoname.admin2         => #geoname_int.admin2
-%% 13 #geoname.admin3         => #geoname_int.admin3
-%% 14 #geoname.admin4         => #geoname_int.admin4
-%% 15 #geoname.population     => #geoname_int.population
-%% 16 #geoname.elevation      => Don't care
-%% 17 #geoname.dem            => Don't care
-%% 18 #geoname.timezone       => #geoname_int.timezone
-%% 19 #geoname.modified       => Don't care
-
-make_geoname_record([V  | Rest],  1, Acc) -> make_geoname_record(string:split(Rest,"\t"),  2, Acc#geoname_int{id             = bin_or_undef(V)});
-make_geoname_record([V  | Rest],  2, Acc) -> make_geoname_record(string:split(Rest,"\t"),  3, Acc#geoname_int{name           = bin_or_undef(V)});
+make_geoname_record([V  | Rest],  1, Acc) -> make_geoname_record(string:split(Rest,"\t"),  2, Acc#geoname_int{id             = undef_or_bin(V)});
+make_geoname_record([V  | Rest],  2, Acc) -> make_geoname_record(string:split(Rest,"\t"),  3, Acc#geoname_int{name           = undef_or_bin(V)});
 make_geoname_record([_V | Rest],  3, Acc) -> make_geoname_record(string:split(Rest,"\t"),  4, Acc);
 make_geoname_record([_V | Rest],  4, Acc) -> make_geoname_record(string:split(Rest,"\t"),  5, Acc);
-make_geoname_record([V  | Rest],  5, Acc) -> make_geoname_record(string:split(Rest,"\t"),  6, Acc#geoname_int{latitude       = bin_or_undef(V)});
-make_geoname_record([V  | Rest],  6, Acc) -> make_geoname_record(string:split(Rest,"\t"),  7, Acc#geoname_int{longitude      = bin_or_undef(V)});
-make_geoname_record([V  | Rest],  7, Acc) -> make_geoname_record(string:split(Rest,"\t"),  8, Acc#geoname_int{feature_class  = bin_or_undef(V)});
-make_geoname_record([V  | Rest],  8, Acc) -> make_geoname_record(string:split(Rest,"\t"),  9, Acc#geoname_int{feature_code   = bin_or_undef(V)});
-make_geoname_record([V  | Rest],  9, Acc) -> make_geoname_record(string:split(Rest,"\t"), 10, Acc#geoname_int{country_code   = bin_or_undef(V)});
+make_geoname_record([V  | Rest],  5, Acc) -> make_geoname_record(string:split(Rest,"\t"),  6, Acc#geoname_int{latitude       = undef_or_bin(V)});
+make_geoname_record([V  | Rest],  6, Acc) -> make_geoname_record(string:split(Rest,"\t"),  7, Acc#geoname_int{longitude      = undef_or_bin(V)});
+make_geoname_record([V  | Rest],  7, Acc) -> make_geoname_record(string:split(Rest,"\t"),  8, Acc#geoname_int{feature_class  = undef_or_bin(V)});
+make_geoname_record([V  | Rest],  8, Acc) -> make_geoname_record(string:split(Rest,"\t"),  9, Acc#geoname_int{feature_code   = undef_or_bin(V)});
+make_geoname_record([V  | Rest],  9, Acc) -> make_geoname_record(string:split(Rest,"\t"), 10, Acc#geoname_int{country_code   = undef_or_bin(V)});
 make_geoname_record([_V | Rest], 10, Acc) -> make_geoname_record(string:split(Rest,"\t"), 11, Acc);
-make_geoname_record([V  | Rest], 11, Acc) -> make_geoname_record(string:split(Rest,"\t"), 12, Acc#geoname_int{admin1         = bin_or_undef(V)});
-make_geoname_record([V  | Rest], 12, Acc) -> make_geoname_record(string:split(Rest,"\t"), 13, Acc#geoname_int{admin2         = bin_or_undef(V)});
-make_geoname_record([V  | Rest], 13, Acc) -> make_geoname_record(string:split(Rest,"\t"), 14, Acc#geoname_int{admin3         = bin_or_undef(V)});
-make_geoname_record([V  | Rest], 14, Acc) -> make_geoname_record(string:split(Rest,"\t"), 15, Acc#geoname_int{admin4         = bin_or_undef(V)});
-make_geoname_record([V  | Rest], 15, Acc) -> make_geoname_record(string:split(Rest,"\t"), 16, Acc#geoname_int{population     = bin_or_undef(V)});
+make_geoname_record([V  | Rest], 11, Acc) -> make_geoname_record(string:split(Rest,"\t"), 12, Acc#geoname_int{admin1         = undef_or_bin(V)});
+make_geoname_record([V  | Rest], 12, Acc) -> make_geoname_record(string:split(Rest,"\t"), 13, Acc#geoname_int{admin2         = undef_or_bin(V)});
+make_geoname_record([V  | Rest], 13, Acc) -> make_geoname_record(string:split(Rest,"\t"), 14, Acc#geoname_int{admin3         = undef_or_bin(V)});
+make_geoname_record([V  | Rest], 14, Acc) -> make_geoname_record(string:split(Rest,"\t"), 15, Acc#geoname_int{admin4         = undef_or_bin(V)});
+make_geoname_record([V  | Rest], 15, Acc) -> make_geoname_record(string:split(Rest,"\t"), 16, Acc#geoname_int{population     = undef_or_bin(V)});
 make_geoname_record([_V | Rest], 16, Acc) -> make_geoname_record(string:split(Rest,"\t"), 17, Acc);
 make_geoname_record([_V | Rest], 17, Acc) -> make_geoname_record(string:split(Rest,"\t"), 18, Acc);
-make_geoname_record([V  | Rest], 18, Acc) -> make_geoname_record(string:split(Rest,"\t"), 19, Acc#geoname_int{timezone       = bin_or_undef(V)});
+make_geoname_record([V  | Rest], 18, Acc) -> make_geoname_record(string:split(Rest,"\t"), 19, Acc#geoname_int{timezone       = undef_or_bin(V)});
 make_geoname_record([_V | Rest], 19, Acc) -> make_geoname_record(string:split(Rest,"\t"),  0, Acc).
 
 %% ---------------------------------------------------------------------------------------------------------------------
-%% Transform string data to a quoted binary string for use in the geoname_int records
-bin_or_undef([]) -> undefined;
-bin_or_undef(V)  -> format:as_quoted_str(V).
-
-
+%% Transform a potentially empty list into a binary value
+undef_or_bin([]) -> undefined;
+undef_or_bin(V)  -> list_to_binary(V).
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Filter out geoname records that don't related to countries or administrative areas
 keep_geoname_record(Rec) ->
-  keep_feature_codes_for_class(Rec#geoname_int.feature_class, Rec, binary_to_integer(Rec#geoname_int.population)).
+  keep_feature_codes_for_class(
+    Rec#geoname_int.feature_class
+  , Rec#geoname_int.feature_code
+  , binary_to_integer(Rec#geoname_int.population)
+  ).
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Administrative areas
-keep_feature_codes_for_class(<<"A">>, Rec, _Pop) ->
-  case Rec#geoname_int.feature_code of
-    <<"ADM1">>  -> {true, a};
-    <<"ADM2">>  -> {true, a};
-    <<"ADM3">>  -> {true, a};
-    <<"ADM4">>  -> {true, a};
-    <<"ADM5">>  -> {true, a};
-    <<"ADMD">>  -> {true, a};
-    <<"PCL">>   -> {true, a};
-    <<"PCLD">>  -> {true, a};
-    <<"PCLF">>  -> {true, a};
-    <<"PCLI">>  -> {true, a};
-    <<"PCLS">>  -> {true, a};
-    _           -> false
-  end;
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_ADM1, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_ADM2, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_ADM3, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_ADM4, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_ADM5, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_ADMD, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_PCL,  _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_PCLD, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_PCLF, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_PCLI, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, ?FEATURE_CODE_PCLS, _Pop) -> {true, a};
+keep_feature_codes_for_class(?FEATURE_CLASS_A, _FeatureCode,       _Pop) -> false;
 
 %% Only keep population centres having a population greater than the limit defined in ?MIN_POPULATION
 %% For smaller countries, the situation might exist in which the administrative centres have a population above the
 %% threshold, but all the individual population centres within it are below the threshold.  This will result in zero
 %% population centres being extracted
-keep_feature_codes_for_class(<<"P">>, Rec, Pop) when Pop >= ?MIN_POPULATION ->
-  case Rec#geoname_int.feature_code of
-    <<"PPL">>   -> {true, p};
-    <<"PPLA">>  -> {true, p};
-    <<"PPLA2">> -> {true, p};
-    <<"PPLA3">> -> {true, p};
-    <<"PPLA4">> -> {true, p};
-    <<"PPLC">>  -> {true, p};
-    <<"PPLG">>  -> {true, p};
-    <<"PPLS">>  -> {true, p};
-    <<"PPLX">>  -> {true, p};
-    _           -> false
+keep_feature_codes_for_class(?FEATURE_CLASS_P, FeatureCode, Pop) when Pop >= ?MIN_POPULATION ->
+  case FeatureCode of
+    ?FEATURE_CODE_PPL   -> {true, p};
+    ?FEATURE_CODE_PPLA  -> {true, p};
+    ?FEATURE_CODE_PPLA2 -> {true, p};
+    ?FEATURE_CODE_PPLA3 -> {true, p};
+    ?FEATURE_CODE_PPLA4 -> {true, p};
+    ?FEATURE_CODE_PPLC  -> {true, p};
+    ?FEATURE_CODE_PPLG  -> {true, p};
+    ?FEATURE_CODE_PPLS  -> {true, p};
+    ?FEATURE_CODE_PPLX  -> {true, p};
+    _FeatureCode        -> false
   end;
 
 keep_feature_codes_for_class(_, _, _) -> false.

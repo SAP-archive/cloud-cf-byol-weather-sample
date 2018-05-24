@@ -175,7 +175,7 @@ const build_cm_trace_checkbox_row = state => {
     , htmlParam("onclick", "toggleCountryManagerDebug(this.checked)") 
   ]
 
-  if (state === "true") cbParams.push(htmlParam("checked"))
+  if (state) cbParams.push(htmlParam("checked"))
 
   var traceCB    = htmlElement('input', cbParams)
   var traceLabel = htmlElement('label', htmlParam("htmlFor", id), "Country manager debug trace")
@@ -196,7 +196,7 @@ const build_trace_checkbox = (cc, state) => {
     , htmlParam("onclick", "toggleCountryServerDebug('" + cc + "',this.checked)") 
   ]
 
-  if (state === "true") cbParams.push(htmlParam("checked"))
+  if (state) cbParams.push(htmlParam("checked"))
 
   return htmlElement('input', cbParams)
 }
@@ -273,7 +273,7 @@ const build_table_columns = country =>
   , htmlElement("td", [TD_ALIGN("center"), status_colour(country.status, country.substatus)], country.substatus)
   , htmlElement("td", [TD_ALIGN("right")], country.progress)
   , htmlElement("td", [TD_ALIGN("right")], country.city_count)
-  , htmlElement("td", [TD_ALIGN("right")], length(country.children))
+  , htmlElement("td", [TD_ALIGN("right")], country.children)
   , htmlElement("td", [TD_ALIGN("right")], format_as_binary_units(country.mem_usage))
   , htmlElement("td", [TD_ALIGN("right")], country.started_at)
   , htmlElement("td", [TD_ALIGN("right")], ms_to_seconds(country.startup_time))

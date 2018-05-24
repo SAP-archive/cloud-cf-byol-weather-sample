@@ -8,6 +8,7 @@
 -export([
     is_quote_delimited/1
   , datatype/1
+  , length/1
 ]).
 
 %% Records
@@ -34,12 +35,12 @@ is_quote_delimited([_ | []]) -> false;     % String length 1
 is_quote_delimited("\"\"")   -> true;      % Empty quoted string
 
 is_quote_delimited(Str) ->
-  case length(Str) == 2 of
+  case erlang:length(Str) == 2 of
     true  ->
       false;
     
     false ->
-      is_quote_delimited(string:slice(Str, 0, 1), string:slice(Str, length(Str) - 1))
+      is_quote_delimited(string:slice(Str, 0, 1), string:slice(Str, erlang:length(Str) - 1))
   end.
 
 
@@ -76,6 +77,10 @@ datatype(V) when is_bitstring(V) -> {bitstring, V};
 
 datatype(V) -> {indeterminate, V}.
 
+%% ---------------------------------------------------------------------------------------------------------------------
+%% Fault tolerant version of the standard length function.  Can handle parameters that might not be lists
+length(L) when is_list(L) -> erlang:length(L);
+length(_)                 -> undefined.
 
 
 %% =====================================================================================================================

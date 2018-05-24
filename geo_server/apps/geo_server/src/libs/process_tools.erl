@@ -36,7 +36,7 @@ memory_usage(ProcessName) ->
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Locate a value in the process dictionary of some other process
 read_process_dictionary(Pid, Name) ->
-  {dictionary, Dict} = erlang:process_info(Pid, dictionary),
+  {dictionary, Dict} = process_info(Pid, dictionary),
   search_dictionary(Name, Dict).
 
 

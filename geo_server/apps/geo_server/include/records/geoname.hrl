@@ -24,13 +24,28 @@
 %%                     (ca 900mx900m) area in meters, integer. srtm processed by cgiar/ciat.
 %% timezone          : the iana timezone id (see file timeZone.txt) varchar(40)
 %% modification date : date of last modification in yyyy-MM-dd format
-
--record(geoname, {id, name, asciiname, alternatenames, latitude, longitude, feature_class, feature_code, country_code,
-                  cc2, admin1, admin2, admin3, admin4, population, elevation, dem, timezone, modified}).
-
-%% ---------------------------------------------------------------------------------------------------------------------
-%% Internal version of Geoname record.  Same as above minus asciiname, alternatenames, cc2, elevation,
-%% dem (digital elevation model) and modified
+%%
+%% Not all of the above fields are needed however. A reduced, internal version of this record is used
+%%
+%%  1 #geoname.id             => #geoname_int.id
+%%  2 #geoname.name           => #geoname_int.name
+%%  3 #geoname.asciiname      => Don't care
+%%  4 #geoname.alternatenames => Don't care
+%%  5 #geoname.latitude       => #geoname_int.latitude
+%%  6 #geoname.longitude      => #geoname_int.longitude
+%%  7 #geoname.feature_class  => #geoname_int.feature_class
+%%  8 #geoname.feature_code   => #geoname_int.feature_code
+%%  9 #geoname.country_code   => #geoname_int.country_code
+%% 10 #geoname.cc2            => Don't care
+%% 11 #geoname.admin1         => #geoname_int.admin1
+%% 12 #geoname.admin2         => #geoname_int.admin2
+%% 13 #geoname.admin3         => #geoname_int.admin3
+%% 14 #geoname.admin4         => #geoname_int.admin4
+%% 15 #geoname.population     => #geoname_int.population
+%% 16 #geoname.elevation      => Don't care
+%% 17 #geoname.dem            => Don't care
+%% 18 #geoname.timezone       => #geoname_int.timezone
+%% 19 #geoname.modified       => Don't care
 
 -record(geoname_int, {id, name, latitude, longitude, feature_class, feature_code, country_code,
                       admin1, admin2, admin3, admin4, population, timezone, admin1_txt, admin2_txt, admin3_txt, admin4_txt}).
