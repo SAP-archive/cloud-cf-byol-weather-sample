@@ -14,7 +14,7 @@ This app provides a weather report for any town or city worldwide having a popul
 
 ## Technical Overview
 
-This application is developed in [Erlang](http://www.erlang.org/) and uses the following open source frameworks: [OTP](http://erlang.org/doc/),  [Cowboy](https://ninenines.eu/) and [iBrowse](https://github.com/cmullaparthi/ibrowse)
+This application is developed in [Scala](http://www.scala-lang.org/) and uses the following open source frameworks: [ScalaJS](https://www.scala-js.org/), [AkkaJS](https://www.akka-js.org/) and [Leaflet](https://leafletjs.com).
 
 The data supplied by this server is derived from a variety of sources:
 
