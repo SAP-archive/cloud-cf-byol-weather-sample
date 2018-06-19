@@ -15,7 +15,8 @@
 -include("../include/macros/file_paths.hrl").
 -include("../include/macros/trace.hrl").
 
--define(DEFAULT_HTTP_PORT, 8080).
+-define(DEFAULT_HTTP_PORT,  8080).
+-define(DEFAULT_PROXY_PORT, 8080).
 
 
 %% =====================================================================================================================
@@ -32,23 +33,14 @@ start(_Type, _Args) ->
   %% Keep trace on in order to log server startup
   put(trace, true),
 
-  ?TRACE("Application start. Type = ~p, Args =~p",[_Type, _Args]),
-  
-	%% Get port number from the environment for incoming HTTP requests
-  Port = case os:getenv("PORT") of
-    false ->
-      ?TRACE("Environment variable PORT not set.  Defaulting to ~w",[?DEFAULT_HTTP_PORT]),
-      ?DEFAULT_HTTP_PORT;
+  %%?TRACE("Application start. Type = ~p, Args =~p",[_Type, _Args]),
 
-    P ->
-      {Int,_} = string:to_integer(P),
-      Int
-  end,
-
+  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   %% Determine if external communication needs to take place through a proxy server
   ProxyInfo = get_proxy_info(),
   ?TRACE("Proxy information = ~p",[ProxyInfo]),
 
+  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   %% Start iBrowse and set connection parameters
   ?TRACE("Starting iBrowse"),
   ibrowse:start(),
@@ -64,21 +56,16 @@ start(_Type, _Args) ->
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	%% Get countryInfo.txt from GeoNames.org and parse it to create a list of {country_code, country_name, continent_code}
-  ?TRACE("Importing country information"),
+  ?TRACE("Importing countryInfo.txt ffrom GeoNames.org"),
   spawn_link(import_files, import_country_info, [self(), ProxyInfo]),
 
   Countries =
 		receive
       {'EXIT', ChildPid, Reason} ->
         case Reason of
-          {retry_limit_exceeded, RetryList} ->
-            ?LOG("Retry limit exceeded downloading ~p",[RetryList]);
-
-          {parse_error, Reason} ->
-            ?LOG("Error ~p parsing countryInfo.txt",[Reason]);
-
-          _ ->
-            ?LOG("Error ~p received from child process ~p",[Reason, ChildPid])
+          {retry_limit_exceeded, RetryList} -> ?LOG("Retry limit exceeded downloading ~p",[RetryList]);
+          {parse_error, Reason1}            -> ?LOG("Error ~p parsing countryInfo.txt",[Reason1]);
+          _                                 -> ?LOG("Error ~p received from child process ~p",[Reason, ChildPid])
         end,
         
         exit({error, Reason});
@@ -87,7 +74,7 @@ start(_Type, _Args) ->
     end,
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  %% Define routes
+  %% Define Cowboy routes and their respective handlers
   Dispatch = cowboy_router:compile([
 		{'_', [
       %% Browser paths
@@ -108,10 +95,26 @@ start(_Type, _Args) ->
 		]}
 	]),
 
+  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  %% Get port number from the environment for incoming HTTP requests
+  Port = case os:getenv("PORT") of
+           false ->
+             ?TRACE("Environment variable PORT not set.  Defaulting to ~w",[?DEFAULT_HTTP_PORT]),
+             ?DEFAULT_HTTP_PORT;
+
+           P ->
+             {Int,_} = string:to_integer(P),
+             Int
+         end,
+
+  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  %% Start Cowboy webserver
   ?TRACE("Starting Cowboy server on port ~w",[Port]),
   cowboy:start_clear(my_http_listener, [{port, Port}], #{env => #{dispatch => Dispatch}}),
 
-  ?TRACE("Starting supervisor"),
+  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  %% Start geo_server supervisor
+  ?TRACE("Starting geo_server supervisor"),
 	geo_server_sup:start(Countries, ProxyInfo).
 
 
@@ -132,26 +135,26 @@ stop(_State) -> geo_server_sup:stop(_State).
 %% If available, obtain HTTP proxy information from the environment.
 %% Returns a tuple of {Host, Port} or {undefined, undefined}
 get_proxy_info() ->
-  Proxy1 = os:getenv("HTTP_PROXY"),
-  Proxy2 = os:getenv("http_proxy"),
+  ProxyUpper = os:getenv("HTTP_PROXY"),
+  ProxyLower = os:getenv("http_proxy"),
   
   %% Has the uppercase version of this variable been set?
-  {Host, Port} = case Proxy1 of
+  {Host, Port} = case ProxyUpper of
     false ->
       %% Nope, so check for the lowercase version of the same variable
-      case Proxy2 of
+      case ProxyLower of
         %% Nope, so we assume that no proxy has been set
         false ->
           {undefined, undefined};
           
-          %% Parse lowercase proxy string to find host and port number
+        %% Parse lowercase proxy string to find host and port number
         _ ->
-          split_proxy_str(Proxy2)
+          split_proxy_str(ProxyLower)
       end;
       
       %% Parse uppercase proxy string to find host and post number
     _ ->
-      split_proxy_str(Proxy1)
+      split_proxy_str(ProxyUpper)
   end,
   
   {{proxy_host, Host}, {proxy_port, Port}}.
@@ -172,7 +175,7 @@ split_proxy_str(ProxyStr) ->
   end,
   
   Port = case PortStr of
-    [] -> 8080;
+    [] -> ?DEFAULT_PROXY_PORT;
     _  -> list_to_integer(hd(PortStr))
   end,
 

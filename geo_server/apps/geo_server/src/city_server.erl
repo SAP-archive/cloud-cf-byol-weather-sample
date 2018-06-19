@@ -34,7 +34,7 @@ init(ParentPid, Id, [City | _] = CityList) ->
 %% ---------------------------------------------------------------------------------------------------------------------
 wait_for_msg(ParentPid, Id, CityList) ->
   receive
-    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %% Process commands
     {cmd, Cmd} ->
       case Cmd of
@@ -47,23 +47,23 @@ wait_for_msg(ParentPid, Id, CityList) ->
 
       wait_for_msg(ParentPid, Id, CityList);
 
-    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %% Add new city
     {add, City} ->
       ?TRACE("Adding city ~s",[binary_to_list(City#geoname_int.name)]),
       wait_for_msg(ParentPid, Id, CityList ++ [City]);
 
-    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %% Memory usage command
     {cmd, mem_usage, RequestHandlerPid} ->
       RequestHandlerPid ! process_tools:memory_usage(self());
 
-    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %% Search city list
     %%
-    %% When testing regular expressions in the Erlang REPL, remember that both
-    %% the REPL and the source code absorb one level of escape characters, so
-    %% regular expression metacharacters such as \s or \b must be double escaped!
+    %% When using regular expressions in either source code or the REPL, remember that both of these environments
+    %% absorb one level of escape characters.  Therefore, regular expression metacharacters such as \s or \b must be
+    %% double escaped!
     %% See the note at the top of http://erlang.org/doc/man/re.html for details
     {Ref, {search_term, Query, whole_word, WholeWord, starts_with, StartsWith}, _CountryCode, Query, CountryServerPid} ->
       ?TRACE("Searching ~w cities in ~s letter ~c for \"~s\"",[length(CityList), _CountryCode, Id, Query]),
@@ -77,11 +77,11 @@ wait_for_msg(ParentPid, Id, CityList) ->
   end.
 
 
-%% -----------------------------------------------------------------------------
+%% ---------------------------------------------------------------------------------------------------------------------
 regexp_hit({match, _}) -> true;
 regexp_hit(nomatch)    -> false.
 
-%% -----------------------------------------------------------------------------
+%% ---------------------------------------------------------------------------------------------------------------------
 %% Construct a regular expression from the parameters
 %% Second parameter = "whole word" flag
 %% Third parameter  = "starts with" flag

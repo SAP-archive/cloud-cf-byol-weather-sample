@@ -36,9 +36,9 @@ init(CountryList, ProxyInfo) ->
   case whereis(?MODULE) of
     undefined -> register(?MODULE, spawn(?MODULE, start, [CountryList, ProxyInfo]));
     _         -> already_registered
-end,
+  end,
 
-{ok, whereis(?MODULE), []}.
+  {ok, whereis(?MODULE), []}.
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
@@ -548,7 +548,7 @@ set_server_status(CountryServerList, Pid, crashed, Substatus, _, _, _) when is_p
   lists:keyreplace(Pid, #country_server.pid, CountryServerList, NewStatus);
 
 %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%% When a server is stopped (either due to no cities, or manual command, we still have its name available
+%% When a server is stopped (either due to no cities, or manual command), we still have its name available
 set_server_status(CountryServerList, Name, stopped, Substatus, _, _, _) ->
   Rec = lists:keyfind(Name, #country_server.name, CountryServerList),
 

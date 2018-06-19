@@ -15,10 +15,10 @@
 -include("../include/macros/trace.hrl").
 
 -define(RESTART_STRATEGY, one_for_one).
--define(INTENSITY, 1).
--define(PERIOD, 5).
+-define(MAX_RESTARTS, 1).
+-define(RESTART_PERIOD, 5).
 
--define(SUPERVISOR_FLAGS, {?RESTART_STRATEGY, ?INTENSITY, ?PERIOD}).
+-define(RESTART_TUPLE, {?RESTART_STRATEGY, ?MAX_RESTARTS, ?RESTART_PERIOD}).
 
 %% =====================================================================================================================
 %%
@@ -27,7 +27,7 @@
 %% =====================================================================================================================
 
 %% ---------------------------------------------------------------------------------------------------------------------
-%% Start server
+%% Start geo_server supervisor
 start(Countries, ProxyInfo) ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, {Countries, ProxyInfo}).
 
@@ -37,10 +37,10 @@ start(Countries, ProxyInfo) ->
 init({Countries, ProxyInfo}) ->
   %% Keep trace on in order to log server startup
   put(trace, true),
-
   ?TRACE("Supervisor initialising country_manager with ~p countries",[length(Countries)]),
+
   { ok
-  , { ?SUPERVISOR_FLAGS
+  , { ?RESTART_TUPLE
     , [ { country_manager
         , { country_manager
           , init
