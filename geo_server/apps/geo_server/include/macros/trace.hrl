@@ -9,7 +9,7 @@
 %% lead to weird "no_match" exceptions at runtime...
 %%
 %% Switched from the use of erlang:now/0 to os:timestamp/0
-%% erlang:now/0 returns a monotonically increasing timestamp guarunteed to be unique across the entire node.
+%% erlang:now/0 returns a monotonically increasing timestamp guaranteed to be unique across the entire node.
 %% The problem with this function however is that it requires the timer value to be locked/unlocked before/after each
 %% call - and this simply doesn't scale!
 %%
@@ -31,14 +31,14 @@
 
 -define(TRACE(Str),
   case get(trace) of
-    true -> (fun(S) -> io:fwrite("~s ~s~n", [?FUNCTION_SIG, S]) end)(Str);
+    true -> (fun(S) -> io:fwrite("~n~s ~s", [?FUNCTION_SIG, S]) end)(Str);
     _    -> trace_off
   end
 ).
 
 -define(TRACE(FStr,Params), 
   case get(trace) of
-    true -> (fun(F, P) -> io:fwrite("~s " ++ F ++ "~n", [?FUNCTION_SIG] ++ P) end)(FStr, Params);
+    true -> (fun(F, P) -> io:fwrite("~n~s " ++ F, [?FUNCTION_SIG] ++ P) end)(FStr, Params);
     _    -> trace_off
   end
 ).
@@ -47,5 +47,6 @@
 %% **********************************************************************************************************************
 %% Write logging output to the console
 %% **********************************************************************************************************************
--define(LOG(FStr,Params), io:fwrite("~s: " ++ FStr ++ "~n", [format:as_datetime(?NOW)] ++ Params)).
+-define(LOG(FStr,Params), io:fwrite("~n~s: " ++ FStr, [format:as_datetime(?NOW)] ++ Params)).
+-define(LOG(Str),         io:fwrite("~n~s: " ++ Str,  [format:as_datetime(?NOW)])).
 

@@ -1,7 +1,9 @@
 -module(utils).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/05/22 10:17:52").
 -created_by("chris.whealy@sap.com").
 

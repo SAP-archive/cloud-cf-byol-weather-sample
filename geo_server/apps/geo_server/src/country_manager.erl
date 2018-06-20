@@ -1,13 +1,15 @@
 -module(country_manager).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/03/02 09:22:03").
 -created_by("chris.whealy@sap.com").
 
 -export([
-    init/2
-  , start/2
+    init/3
+  , start/3
 ]).
 
 %% Put -defines before -includes because COUNTRY_SERVER_NAME is needed in server_status.hrl
@@ -31,10 +33,10 @@
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Initialise the country manager
-init(CountryList, ProxyInfo) ->
+init(CountryList, ProxyInfo, MongoPid) ->
   %% Is the country_manager process already registered?
   case whereis(?MODULE) of
-    undefined -> register(?MODULE, spawn(?MODULE, start, [CountryList, ProxyInfo]));
+    undefined -> register(?MODULE, spawn(?MODULE, start, [CountryList, ProxyInfo, MongoPid]));
     _         -> already_registered
   end,
 
@@ -45,15 +47,16 @@ init(CountryList, ProxyInfo) ->
 %% Start the country manager
 %%
 %% This process is responsible for starting and then managing each of the individual country servers
-start(CountryList, {ProxyHost, ProxyPort}) ->
+start(CountryList, {ProxyHost, ProxyPort}, MongoPid) ->
   process_flag(trap_exit, true),
 
   %% Keep the debug trace flag switched off by default.  Can be switched on from the admin screen
   put(trace, false),
 
-  %% Store the proxy information in the process dictionary
+  %% Store the proxy information and MOngoDB coonnection pid in the process dictionary
   put(proxy_host, ProxyHost),
   put(proxy_port, ProxyPort),
+  put(mongo_pid,  MongoPid),
 
   %% The default sort order is by ascending continent name
   wait_for_msgs(lists:sort(

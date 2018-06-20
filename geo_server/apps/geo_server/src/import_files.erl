@@ -1,7 +1,9 @@
 -module(import_files).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/02/08 11:15:07").
 -created_by("chris.whealy@sap.com").
 
@@ -94,33 +96,38 @@ http_get_request(CallerPid, Filename, Ext) ->
     _    -> put(trace, false)
   end,
 
-  %% Define HTTP GET request options
-  Options = define_http_options(CallerPid),
-
-  %% Check to see if we have an ETag for this file
-  Response = case read_etag_file(Filename) of
-    missing -> 
-      ?TRACE("ETag file missing, sending normal GET request for ~s",[Url]),
-      ibrowse:send_req(Url, [], get, [], Options);
-
-    Etag ->
-      ?TRACE("Sending conditional GET request for ~s",[Url]),
-      ibrowse:send_req(Url, [{"If-None-Match", Etag}], get, [], Options)
+  %% If we have an ETag for this file, then set the HTTP header for the GET request to be a conditional request
+  If_none_match_hdr = case read_etag_file(Filename) of
+    missing -> [];
+    Etag    -> [{"If-None-Match", Etag}]
   end,
-    
-  CallerPid ! case Response of
+
+  %% Issue the HTTP request and send the response back to the calling process
+  CallerPid ! case ibrowse:send_req(
+      Url                              %% File being requested
+    , If_none_match_hdr                %% HTTP headers
+    , get                              %% HTTP method
+    , []                               %% HHTP request body
+    , define_http_options(CallerPid)   %% HTTP options
+    ) of
+    %% Successfully downloaded the data to a temporary file
     {ok, "200", Hdrs, {file, TempFilename}} ->
       ?TRACE("HTTP 200 for ~s",[Url]),
       {ok, Filename, Ext, get_etag(Hdrs), TempFilename};
 
+    %% File has not been modified since the last request
     {ok, "304", _Hdrs, _Body} ->
       ?TRACE("HTTP 304 for ~s",[Url]),
       {not_modified, Filename, Ext};
-      
+
+    %% Got some other HTTP status code
     {ok, StatusCode, _Hdrs, _Body} ->
-      ?TRACE("HTTP ~s for ~s",[StatusCode, Url]),
+      {_, Desc} = http_status_code(StatusCode),
+
+      ?LOG("Got HTTP ~s (~p) when requesting ~s",[StatusCode, Desc, Url]),
       {error, {status_code, string:to_integer(StatusCode)}, Filename, Ext};
 
+    %% Some other error
     {error, Reason} ->
       ?TRACE("Error ~p for ~s",[Reason, Url]),
       {error, {other, Reason}, Filename, Ext}

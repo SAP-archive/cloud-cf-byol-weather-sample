@@ -1,8 +1,10 @@
 -module(geo_server_app).
 -behaviour(application).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/02/02 13:15:19").
 -created_by("chris.whealy@sap.com").
 
@@ -18,6 +20,32 @@
 -define(DEFAULT_HTTP_PORT,  8080).
 -define(DEFAULT_PROXY_PORT, 8080).
 
+%% Limit the number of parallel HTTP connections used by iBrowse to 10, and the number of queued requests to 25
+-define(HTTP_SESSIONS, 10).
+-define(HTTP_PIPELINE, 25).
+
+%% Define Cowboy routes and their respective handlers
+-define(ROUTE_DEFINITIONS, [
+  %% Browser API
+   {"/",                    handle_root,                []}
+  ,{"/server_status",       handle_server_status,       []}
+  ,{"/client_info",         handle_client_info,         []}
+  ,{"/search",              handle_search,              []}
+
+  %% Command API
+  ,{"/country_manager_cmd", handle_country_manager_cmd, []}
+  ,{"/country_server_cmd",  handle_country_server_cmd,  []}
+
+  %% Handle static files
+  ,{"/server_info",         cowboy_static, {priv_file, geo_server, "html/server_info.html"}}
+  ,{"/js/server_info.js",   cowboy_static, {priv_file, geo_server, "js/server_info.js"}}
+  ,{"/css/server_info.css", cowboy_static, {priv_file, geo_server, "css/server_info.css"}}
+  ,{"/img/[...]",           cowboy_static, {priv_dir,  geo_server, "img"}}
+]).
+
+%% MongoDB instance name
+-define(MONGODB_NAME, <<"geo_server_db">>).
+
 
 %% =====================================================================================================================
 %%
@@ -30,23 +58,25 @@
 start(_Type, _Args) ->
   process_flag(trap_exit, true),
 
-  %% Keep trace on in order to log server startup
-  put(trace, true),
-
-  %%?TRACE("Application start. Type = ~p, Args =~p",[_Type, _Args]),
+  %%?LOG("Application start. Type = ~p, Args =~p",[_Type, _Args]),
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   %% Determine if external communication needs to take place through a proxy server
   ProxyInfo = get_proxy_info(),
-  ?TRACE("Proxy information = ~p",[ProxyInfo]),
+  ?LOG("Proxy information = ~p",[ProxyInfo]),
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   %% Start iBrowse and set connection parameters
-  ?TRACE("Starting iBrowse"),
+  ?LOG("Starting iBrowse"),
+  ?LOG("Configuring iBrowse:"),
+  ?LOG("  Destination                    = ~s:~w",[?GEONAMES_HOST, ?GEONAMES_PORT]),
+  ?LOG("  Parallel HTTP connection limit = ~w",[?HTTP_SESSIONS]),
+  ?LOG("  HTTP request queue length      = ~w",[?HTTP_PIPELINE]),
+  
   ibrowse:start(),
   ibrowse:set_dest(?GEONAMES_HOST, ?GEONAMES_PORT, []),
-  ibrowse:set_max_sessions(?GEONAMES_HOST, ?GEONAMES_PORT, 10),
-  ibrowse:set_max_pipeline_size(?GEONAMES_HOST, ?GEONAMES_PORT, 25),
+  ibrowse:set_max_sessions(?GEONAMES_HOST, ?GEONAMES_PORT, ?HTTP_SESSIONS),
+  ibrowse:set_max_pipeline_size(?GEONAMES_HOST, ?GEONAMES_PORT, ?HTTP_PIPELINE),
 
   %% Don't switch iBrowse trace on because it swamps the log files...
   % case get(trace) of
@@ -56,72 +86,57 @@ start(_Type, _Args) ->
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	%% Get countryInfo.txt from GeoNames.org and parse it to create a list of {country_code, country_name, continent_code}
-  ?TRACE("Importing countryInfo.txt ffrom GeoNames.org"),
+  ?LOG("Importing countryInfo.txt from GeoNames.org"),
   spawn_link(import_files, import_country_info, [self(), ProxyInfo]),
 
-  Countries =
-		receive
-      {'EXIT', ChildPid, Reason} ->
-        case Reason of
-          {retry_limit_exceeded, RetryList} -> ?LOG("Retry limit exceeded downloading ~p",[RetryList]);
-          {parse_error, Reason1}            -> ?LOG("Error ~p parsing countryInfo.txt",[Reason1]);
-          _                                 -> ?LOG("Error ~p received from child process ~p",[Reason, ChildPid])
-        end,
-        
-        exit({error, Reason});
-
-			{country_list, L} -> L
-    end,
-
-  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  %% Define Cowboy routes and their respective handlers
-  Dispatch = cowboy_router:compile([
-		{'_', [
-      %% Browser paths
-       {"/",                    handle_root,                []}
-      ,{"/server_status",       handle_server_status,       []}
-      ,{"/client_info",         handle_client_info,         []}
-      ,{"/search",              handle_search,              []}
-
-      %% Command API
-      ,{"/country_manager_cmd", handle_country_manager_cmd, []}
-      ,{"/country_server_cmd",  handle_country_server_cmd,  []}
-
-      %% Handle static files
-      ,{"/server_info",         cowboy_static, {priv_file, geo_server, "html/server_info.html"}}
-      ,{"/js/server_info.js",   cowboy_static, {priv_file, geo_server, "js/server_info.js"}}
-      ,{"/css/server_info.css", cowboy_static, {priv_file, geo_server, "css/server_info.css"}}
-      ,{"/img/[...]",           cowboy_static, {priv_dir,  geo_server, "img"}}
-		]}
-	]),
-
-  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  %% Get port number from the environment for incoming HTTP requests
-  Port = case os:getenv("PORT") of
-           false ->
-             ?TRACE("Environment variable PORT not set.  Defaulting to ~w",[?DEFAULT_HTTP_PORT]),
-             ?DEFAULT_HTTP_PORT;
-
-           P ->
-             {Int,_} = string:to_integer(P),
-             Int
-         end,
+  Countries = wait_for_countries(),
+  Port      = get_port_info(),
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   %% Start Cowboy webserver
-  ?TRACE("Starting Cowboy server on port ~w",[Port]),
-  cowboy:start_clear(my_http_listener, [{port, Port}], #{env => #{dispatch => Dispatch}}),
+  ?LOG("Starting Cowboy server on port ~w",[Port]),
+  cowboy:start_clear(
+    my_http_listener
+  , [{port, Port}]
+  , #{env => #{dispatch => cowboy_router:compile([{'_', ?ROUTE_DEFINITIONS}])}}
+  ),
+
+  %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  %% Connect to MongoDB instance
+  % ?LOG("Connecting to MongoDB"),
+
+  % case mc_worker_api:connect([{database, ?MONGODB_NAME}]) of
+  %   {error, Reason} ->
+  %     ?LOG("Unable to connect to MongoDB instance: ~p", [Reason]);
+
+  %   {ok, SomePid} ->
+  %     ?LOG("Connected to MongoDB via pid ~p",[SomePid]),
+  %     put(mongo_pid, SomePid)
+  % end,
 
   %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   %% Start geo_server supervisor
-  ?TRACE("Starting geo_server supervisor"),
-	geo_server_sup:start(Countries, ProxyInfo).
+  ?LOG("Starting geo_server supervisor"),
+	geo_server_sup:start(Countries, ProxyInfo, get(mongo_pid)).
 
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Stop the geo_server application
-stop(_State) -> geo_server_sup:stop(_State).
+stop(_State) ->
+  ?LOG("geo_server application shutting down"),
+
+  %% Disconnect from MongoDB instance
+  case get(mongo_pid) of
+    undefined ->
+      ok;
+
+    SomePid ->
+      mc_worker_api:disconnect(SomePid),
+      ?LOG("Disconnected from MongoDB")
+  end,
+
+  geo_server_sup:stop(_State).
 
 
 
@@ -181,4 +196,33 @@ split_proxy_str(ProxyStr) ->
 
   {Host, Port}.
 
-    
+
+%% ---------------------------------------------------------------------------------------------------------------------
+%% Get port number from the environment for incoming HTTP requests
+get_port_info() ->
+  case os:getenv("PORT") of
+    false ->
+      ?LOG("Environment variable PORT not set.  Defaulting to ~w",[?DEFAULT_HTTP_PORT]),
+      ?DEFAULT_HTTP_PORT;
+
+    P ->
+      {Int,_} = string:to_integer(P),
+      Int
+  end.
+
+
+%% ---------------------------------------------------------------------------------------------------------------------
+wait_for_countries() ->
+  receive
+    {'EXIT', ChildPid, Reason} ->
+      case Reason of
+        {retry_limit_exceeded, RetryList} -> ?LOG("Retry limit exceeded downloading ~p",[RetryList]);
+        {parse_error, Reason1}            -> ?LOG("Error ~p parsing countryInfo.txt",[Reason1]);
+        _                                 -> ?LOG("Error ~p received from child process ~p",[Reason, ChildPid])
+      end,
+
+      exit({error, Reason});
+
+    {country_list, L} -> L
+  end.
+

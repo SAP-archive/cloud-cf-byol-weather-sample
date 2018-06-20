@@ -1,9 +1,13 @@
 %% ---------------------------------------------------------------------------------------------------------------------
-%% Transform all known HTTP status codes into a tuple of {Boolean, String}
+%% Transform all known HTTP status codes into a tuple of {Boolean, BinaryString}
 %% 
-%% Boolean = Is status code IANA standard?
-%% String  = Text description
+%% Boolean      = Is status code IANA standard?
+%% BinaryString = Status code meaning
 %% ---------------------------------------------------------------------------------------------------------------------
+
+%% Convert a string argument to integer
+http_status_code(Code) when is_list(Code) ->
+  http_status_code(list_to_integer(Code));
 
 
 %% Information 100 -> 199

@@ -1,7 +1,9 @@
 -module(country_server).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/02/16 13:24:21").
 -created_by("chris.whealy@sap.com").
 

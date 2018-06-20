@@ -1,13 +1,15 @@
 -module(geo_server_sup).
 -behaviour(supervisor).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/02/02 13:17:39").
 -created_by("chris.whealy@sap.com").
 
 -export([
-   start/2
+   start/3
  , stop/1
  , init/1
 ]).
@@ -28,23 +30,21 @@
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Start geo_server supervisor
-start(Countries, ProxyInfo) ->
-  supervisor:start_link({local, ?MODULE}, ?MODULE, {Countries, ProxyInfo}).
+start(Countries, ProxyInfo, MongoPid) ->
+  supervisor:start_link({local, ?MODULE}, ?MODULE, {Countries, ProxyInfo, MongoPid}).
 
 
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Initialise server
-init({Countries, ProxyInfo}) ->
-  %% Keep trace on in order to log server startup
-  put(trace, true),
-  ?TRACE("Supervisor initialising country_manager with ~p countries",[length(Countries)]),
+init({Countries, ProxyInfo, MongoPid}) ->
+  ?LOG("geo_server supervisor starting country_manager with ~p countries",[length(Countries)]),
 
   { ok
   , { ?RESTART_TUPLE
     , [ { country_manager
         , { country_manager
           , init
-          , [Countries, ProxyInfo]
+          , [Countries, ProxyInfo, MongoPid]
           }
         , permanent
         , brutal_kill
@@ -59,7 +59,7 @@ init({Countries, ProxyInfo}) ->
 %% ---------------------------------------------------------------------------------------------------------------------
 %% Stop server
 stop(_State) ->
-  ?TRACE("Supervisor shutting down"),
+  ?LOG("geo_server supervisor shutting down"),
 
   %% Tell the country_manager to shut down
   country_manager ! {cmd, terminate, self()},

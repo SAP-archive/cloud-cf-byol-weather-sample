@@ -1,8 +1,10 @@
 -module(handle_country_manager_cmd).
 -behavior(cowboy_handler).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/04/17 11:43:29").
 -created_by("chris.whealy@sap.com").
 

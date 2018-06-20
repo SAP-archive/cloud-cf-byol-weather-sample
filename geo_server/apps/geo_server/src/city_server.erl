@@ -1,7 +1,9 @@
 -module(city_server).
 
+-include("../include/macros/revision.hrl").
+-revision(?REVISION).
+
 -author("Chris Whealy <chris.whealy@sap.com>").
--revision("Revision: 1.0.0").
 -created("Date: 2018/02/19 17:31:51").
 -created_by("chris.whealy@sap.com").
 
