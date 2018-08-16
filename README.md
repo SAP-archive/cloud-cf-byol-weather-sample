@@ -86,7 +86,7 @@ The full list of community-developed buildpacks is listed on the [Cloud Foundry 
 
 You might however find yourself in the situation that the existing community buildpack for your chosen language has become obsolete or is broken.
 
-This is the situation I encountered when writing in Erlang.  The existing community buildpack had not been updated in about 4 years, and was no longer able build my app using the latest version of Erlang's build tool.
+This is the situation I encountered when writing in Erlang.  The existing community buildpack had not been updated in about 4 years, and was no longer able build my app using the latest version of Erlang's build tool (Rebar3).
 
 Nonetheless, by following Cloud Foundry's [buildpack documentation](https://docs.cloudfoundry.org/buildpacks/understand-buildpacks.html), I was able adapt the obsolete buildpack quite easily in order to get it back into working order.
 
@@ -110,6 +110,6 @@ Copyright (c) 2013-2018 SAP SE
 
 Except as provided below, this software is licensed under the Apache License, Version 2.0 (the "License"); you may not use this software except in compliance with the License. You may obtain a copy of the License at:
 
-[http://www.apache.org/licenses/LICENSE-2.0] (http://www.apache.org/licenses/LICENSE-2.0)
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
