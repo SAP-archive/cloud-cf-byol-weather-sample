@@ -100,4 +100,4 @@ This app is written in Scala using the [ScalaJS](https://www.scala-js.org/) and 
 
 See the presentation [Using the Actor Model](./documentation/Using%20the%20Actor%20Model.ppsx) in the documentation folder for both an overview of the Actor Model design concept, and a description of this application's internal architecture.
 
-A running version of this app can be found [here](https://weather-report.cfapps.eu10.hana.ondemand.com/).
+A running version of this app can be found [here](https://weather-report.cfapps.us10.hana.ondemand.com/).
