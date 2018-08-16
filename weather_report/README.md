@@ -5,8 +5,8 @@
 ## Purpose of this app
 This Scala app is designed to demonstrate two things:
 
-* The ease with which an interactive web app can be built using the Actor Model.
 * The Cloud Foundry concept of "Bring your language"
+* The ease with which an interactive web app can be built using the Actor Model.
 
 ## Overview
 
@@ -65,7 +65,11 @@ Clone this repo onto your local machine and build using either:
 1. `sbt fullOptJS` then launch using `index.html`
 1. `sbt fastOptJS` then launch using `index-dev.html`
 
-For development purposes, this app uses the ScalaJS add-on [Workbench](https://github.com/lihaoyi/workbench); therefore, if you wish to run this app locally, build it using `sbt ~fastOptJS` and point your browser to the [local webpage](http://localhost:12345/target/scala-2.12/classes/index-dev.html)
+For development purposes, this app uses the ScalaJS add-on [Workbench](https://github.com/lihaoyi/workbench); therefore, if you wish to run this app locally:
+
+* Comment out the appropriate line at lines 162/163 of `Utils.scala` to point to `localhost`
+* Rebuild the project using `sbt ~fastOptJS`
+* Point your browser to the [local webpage](http://localhost:12345/target/scala-2.12/classes/index-dev.html)
 
 If you wish to see the runtime trace/debug information, then within each class or object there is a Boolean variable called `traceActive`.  Change this to `true`, recompile the app and you will then see that class or object's runtime output in the browser console.
 
@@ -74,24 +78,26 @@ If you wish to see the runtime trace/debug information, then within each class o
 
 For those who have no Scala development experience, a compiled version of the project is available as a ZIP file that, once unzipped, can be deployed to Cloud Foundry using `cf push`.
 
-Download the file `cf-weather-report.zip`, unzip it into some local directory, then follow the instructions for deployment to Cloud Foundry.
-
-
 
 ## Deployment to Cloud Foundry
 
+1. Clone this repo into some local directory
 1. Edit `manifest.yml` and change the name of the app to include your userid.  E.G. `- name:      <my_userid>-weather-report`
-1. After saving your changes, open a command prompt and change into the directory containing `manifest.yml`.
-1. If you have not already done so, set your Cloud Foundry API endpoint. For instance, if you have an account on the European (Frankfurt) server, then use the command:
-    `cf api https://cfapps.eu10.hana.ondemand.com`
+1. Unzip `cf-weather-report.zip`  
+    The deployable application is now located in the directory `target/scala-2.12/classes`
+1. Edit line 46 of the file `target/scala-2.12/classes/index.html` and add your own API key as per the instructions above
+1. Open a command prompt and change into the directory containing `manifest.yml`.
+1. If you have not already done so, set your Cloud Foundry API endpoint.  
+    For instance, if you have an account on SAP's European (Frankfurt) server, then use the command:
+    `cf api https://api.cf.eu10.hana.ondemand.com`
 1. Log in to Cloud Foundry with `cf login` and supply your credentials
-1. Push the application to your Cloud Foundry account using `cf push`.  If the push fails, check in the `manifest.yml` file that you have given the application a globally unique name.
+1. Push the application to your Cloud Foundry account using `cf push`.  If the push fails, check that the application name you have given in `manifest.yml` is globally unique.
 
 
 ## Implementation Details
 
 This app is written in Scala using the [ScalaJS](https://www.scala-js.org/) and [Akka-Actor](https://akka.io/) frameworks.
 
-See the presentation [Using the Actor Model](./documentation/Using%20the%20Actor%20Model.ppsx) in the documentation folder for both an overview of the Actor Model design concept, and a description of the application's internal architecture.
- 
-A running version of this app can be found deployed to my trial [Cloud Foundry](https://weather-report.cfapps.eu10.hana.ondemand.com/) account.
+See the presentation [Using the Actor Model](./documentation/Using%20the%20Actor%20Model.ppsx) in the documentation folder for both an overview of the Actor Model design concept, and a description of this application's internal architecture.
+
+A running version of this app can be found [here](https://weather-report.cfapps.eu10.hana.ondemand.com/).
