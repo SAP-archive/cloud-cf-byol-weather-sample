@@ -75,9 +75,9 @@ object Maps {
         maxZoom(19).
         attribution(
           """Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,
-            | Found a map problem? <a href="http://openstreetmap.org/fixthemap">Fix the map</a>,
-            | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
-            | Imagery © <a href="http://mapbox.com">Mapbox</a>""".stripMargin)
+            |Found a map problem? <a href="http://openstreetmap.org/fixthemap">Fix the map</a>,
+            |<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
+            |Imagery © <a href="http://mapbox.com">Mapbox</a>""".stripMargin)
     ).addTo(mapRef)
 
     // Add click event handler to the map
