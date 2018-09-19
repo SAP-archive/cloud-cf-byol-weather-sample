@@ -33,7 +33,7 @@ If the answer to the second question is "No", then although you might have to do
 
 Please read the [Cloud Foundry Buildpack](./docs/cf_buildpacks.md) document for more information about build packs in general and how to create your own.
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="description"></a>
@@ -61,7 +61,7 @@ Detailed documentation for Weather Report can be found [here](./weather_report/R
 
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="requirements"></a>
@@ -76,7 +76,7 @@ In your local clone directory, you will now have two subdirectories: `./geo_serv
 Since these two parts of the application have been written in different languages and are designed to fulfil different roles, each part has its own specific deployment instructions.  Please refer to the README documents in these respective subdirectories to find the relevant deployment instructions.
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="download"></a>
@@ -94,7 +94,7 @@ Please refer to the README documents in the respective `weather_report` and `geo
 
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="configuration"></a>
@@ -103,7 +103,7 @@ Please refer to the README documents in the respective `weather_report` and `geo
 Please refer to the README documents in the respective `weather_report` and `geo_server` subdirectories to find the relevant configuration instructions.
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="limitations"></a>
@@ -113,7 +113,7 @@ The server-side app called `geo_server` currently stores all geopolitical data a
 
 Therefore, this download process must be repeated each time `geo_server` is started.
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="issues"></a>
@@ -122,7 +122,7 @@ Therefore, this download process must be repeated each time `geo_server` is star
 No known issues so far...
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="support"></a>
@@ -132,7 +132,7 @@ No known issues so far...
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="authors"></a>
@@ -141,7 +141,7 @@ This project is provided "as-is": there is no guarantee that raised issues will 
     <https://github.com/ChrisWhealy>
 
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
 
 <!-- *********************************************************************** -->
 <a name="license"></a>
@@ -150,4 +150,4 @@ This project is provided "as-is": there is no guarantee that raised issues will 
 Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
 This project is licensed under the Apache Software License, Version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
 
-<a name="contents">Top</a>
+<a href="#contents">Top</a>
