@@ -67,13 +67,9 @@ Detailed documentation for Weather Report can be found [here](./weather_report/R
 <a name="requirements"></a>
 ## Requirements
 
-First of all, clone this repository into some suitable directory on your local machine.
+Since these two parts of the application have been written in different languages and are designed to fulfil different roles, each part has its own specific requirements and deployment instructions.
 
-    $ git clone https://github.wdf.sap.corp/coolapps/WeatherDemo.git
-
-In your local clone directory, you will now have two subdirectories: `./geo_server` and `./weather_report`.  The former contains the server-side part of the app and the latter, the client-side part.
-
-Since these two parts of the application have been written in different languages and are designed to fulfil different roles, each part has its own specific deployment instructions.  Please refer to the README documents in these respective subdirectories to find the relevant deployment instructions.
+Please refer to the README documents in the respective `weather_report` and `geo_server` subdirectories to find the relevant deployment instructions.
 
 
 <a href="#contents">Top</a>
