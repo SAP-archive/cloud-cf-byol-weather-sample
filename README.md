@@ -10,8 +10,7 @@
 1. [Configuration](#configuration)
 1. [Limitations](#limitations)
 1. [Known Issues](#issues)
-1. [Support](#support)
-1. [Contributing](#contributing)
+1. [Support and Contributing](#support)
 1. [Authors](#authors)
 1. [License](#license)
 
@@ -145,5 +144,10 @@ This project is provided "as-is": there is no guarantee that raised issues will 
 
 Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
 This project is licensed under the Apache Software License, Version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
+
+Any Open Source libraries used by these applications are listed in the respective language-specific files:
+
++ [Scala](./CREDITS-SCALA)
++ [Erlang](./CREDITS-ERLANG)
 
 <a href="#contents">Top</a>
