@@ -1,6 +1,43 @@
-# Weather Demo: Cloud Foundry's "Bring Your own Language" Concept
+# cloud-cf-byol-weather-sample
 
-## Architecture
+<!-- *********************************************************************** -->
+<a name="contents"></a>
+## Table of Contents
+1. [Overview](#overview)
+1. [Description](#description)
+1. [Requirements](#requirements)
+1. [Download & Installation](#download)
+1. [Configuration](#configuration)
+1. [Limitations](#limitations)
+1. [Known Issues](#issues)
+1. [Support](#support)
+1. [Contributing](#contributing)
+1. [Authors](#authors)
+1. [License](#license)
+
+
+<!-- *********************************************************************** -->
+<a name="overview"></a>
+## Cloud Foundry's "Bring Your own Language" Concept
+
+Java is most certainly one of the most popular development languages at the moment; however, Cloud Foundry offers developers the opportunity to create their own applications using almost ***any*** programming language.
+
+The only factors constraining your choice of language are:
+
+* Has your chosen language been implemented to run on Windows or Linux?
+* Does your chosen language have a Cloud Foundry buildpack?
+
+If the answer to the first question is "No", then unfortunately all bets are off and you must choose a different language.
+
+If the answer to the second question is "No", then although you might have to do a little more work, this is certainly not a show-stopper.
+
+Please read the [Cloud Foundry Buildpack](./docs/cf_buildpacks.md) document for more information about build packs in general and how to create your own.
+
+<a name="contents">Top</a>
+
+<!-- *********************************************************************** -->
+<a name="description"></a>
+## Description
 
 The Weather Demo is written in two parts:
 
@@ -21,7 +58,14 @@ The client-side part is written in Scala and compiled to JavaScript using the [S
 
 Detailed documentation for Weather Report can be found [here](./weather_report/README.md).
 
-## Using Multi-Language Repository
+
+
+
+<a name="contents">Top</a>
+
+<!-- *********************************************************************** -->
+<a name="requirements"></a>
+## Requirements
 
 First of all, clone this repository into some suitable directory on your local machine.
 
@@ -31,85 +75,79 @@ In your local clone directory, you will now have two subdirectories: `./geo_serv
 
 Since these two parts of the application have been written in different languages and are designed to fulfil different roles, each part has its own specific deployment instructions.  Please refer to the README documents in these respective subdirectories to find the relevant deployment instructions.
 
-# Cloud Foundry's "Bring Your Own Language" Concept
 
-Java is most certainly one of the most popular development languages at the moment; however, Cloud Foundry offers developers the opportunity to create their own applications using almost ***any*** programming language.
+<a name="contents">Top</a>
 
-The only factors constraining your choice of language are:
+<!-- *********************************************************************** -->
+<a name="download"></a>
+## Download and Installation
 
-* Has your chosen language been implemented to run on Windows or Linux?
-* Does your chosen language have a Cloud Foundry buildpack?
+First of all, clone this repository into some suitable directory on your local machine.
 
-If the answer to the first question is "No", then unfortunately all bets are off and you must choose a different language.
+    $ git clone https://github.wdf.sap.corp/coolapps/WeatherDemo.git
 
-If the answer to the second question is "No", then although you might have to do a little more work, this is certainly not a show-stopper.
+In your local clone directory, you will now have two subdirectories: `./geo_server` and `./weather_report`.  The former contains the server-side part of the app and the latter, the client-side part.
 
-## Cloud Foundry Buildpacks
+Since these two parts of the application have been written in different languages and are designed to fulfil different roles, each part has its own specific deployment instructions.  
 
-Before developing an application on your local machine, you must first install the set of tools appropriate for compiling your source code and creating an executable application.  A buildpack is nothing more than a set of shell scripts that repeat this process in the Cloud Foundry runtime environment in order to compile and execute your application.
-
-
-### Buildpacks Built-in To Cloud Foundry
-
-Cloud Foundry provides built-in support for the following languages:
-
-* [Java](https://github.com/cloudfoundry/java-buildpack)
-* [Ruby](https://github.com/cloudfoundry/ruby-buildpack)
-* [PHP](https://github.com/cloudfoundry/php-buildpack)
-* [Go](https://github.com/cloudfoundry/go-buildpack)
-* [Python](https://github.com/cloudfoundry/python-buildpack)
-
-and runtime environments:
-
-* [NodeJS (Server-side JavaScript)](https://github.com/cloudfoundry/nodejs-buildpack)
-* [Web servers delivering static content (Via an NGINX Web server)](https://github.com/cloudfoundry/staticfile-buildpack)
-* [Arbitrary binary Web servers](https://github.com/cloudfoundry/binary-buildpack)
-* [.NET Core Applications](https://github.com/cloudfoundry/dotnet-core-buildpack)
-
-### Community-Developed Buildpacks
-
-If however, your favourite language is not listed here, then there is a range of community developed buildpacks from which to choose.  These include buildpacks for languages such as:
-
-* [Clojure](https://github.com/mstine/heroku-buildpack-clojure)
-* [Scala](https://github.com/heroku/heroku-buildpack-scala)
-* [Haskell](https://github.com/BrianMMcClain/heroku-buildpack-haskell)
-* [Erlang](https://github.com/ChrisWhealy/cf-buildpack-erlang)
-* [Elixir](https://github.com/HashNuke/heroku-buildpack-elixir)
-* [Rust](https://github.com/emk/heroku-buildpack-rust)
-* [Swift](https://github.com/cloudfoundry-community/swift-buildpack)
-
-There is even a [Generic Language](https://github.com/oetiker/sourcey-buildpack) buildpack that, using a system of plugins, can compile and build a wide range of languages.
-
-The full list of community-developed buildpacks is listed on the [Cloud Foundry Community Buildpack](https://github.com/cloudfoundry-community/cf-docs-contrib/wiki/Buildpacks) Wiki on GitHub.com.
-
-### Do-It-Yourself Buildpacks
-
-You might however find yourself in the situation that the existing community buildpack for your chosen language has become obsolete or is broken.
-
-This is the situation I encountered when writing in Erlang.  The existing community buildpack had not been updated in about 4 years, and was no longer able build my app using the latest version of Erlang's build tool (Rebar3).
-
-Nonetheless, by following Cloud Foundry's [buildpack documentation](https://docs.cloudfoundry.org/buildpacks/understand-buildpacks.html), I was able adapt the obsolete buildpack quite easily in order to get it back into working order.
-
-My [Erlang buildpack](https://github.com/ChrisWhealy/cf-buildpack-erlang) is now listed on the [Cloud Foundry Community Buildpack page](https://github.com/cloudfoundry-community/cf-docs-contrib/wiki/Buildpacks).
+Please refer to the README documents in the respective `weather_report` and `geo_server` subdirectories to find the relevant installation instructions.
 
 
 
+<a name="contents">Top</a>
 
-Authors
--------
+<!-- *********************************************************************** -->
+<a name="configuration"></a>
+## Configuration
 
-**Chris Whealy**
-
-+ https://github.com/ChrisWhealy
+Please refer to the README documents in the respective `weather_report` and `geo_server` subdirectories to find the relevant configuration instructions.
 
 
-Copyright and License
----------------------
+<a name="contents">Top</a>
 
-Copyright (c) 2013-2018 SAP SE
+<!-- *********************************************************************** -->
+<a name="limitations"></a>
+## Limitations
 
-Except as provided below, this software is licensed under the Apache License, Version 2.0 (the "License"); you may not use this software except in compliance with the License. You may obtain a copy of the License at:
+The server-side app called `geo_server` currently stores all geopolitical data as flat text files.  These files must be downloaded when the application starts, and ***do not*** persist if `geo_server` is stopped.
 
-[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+Therefore, this download process must be repeated each time `geo_server` is started.
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+<a name="contents">Top</a>
+
+<!-- *********************************************************************** -->
+<a name="issues"></a>
+## Known Issues
+
+No known issues so far...
+
+
+<a name="contents">Top</a>
+
+<!-- *********************************************************************** -->
+<a name="support"></a>
+<a name="contributing"></a>
+## Support and Contributing
+
+This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
+
+
+<a name="contents">Top</a>
+
+<!-- *********************************************************************** -->
+<a name="authors"></a>
+## Authors
++ **Chris Whealy**  
+    <https://github.com/ChrisWhealy>
+
+
+<a name="contents">Top</a>
+
+<!-- *********************************************************************** -->
+<a name="license"></a>
+## License
+
+Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+This project is licensed under the Apache Software License, Version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
+
+<a name="contents">Top</a>
