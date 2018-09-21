@@ -3,13 +3,13 @@
 <!-- *********************************************************************** -->
 <a name="contents"></a>
 
-Using the concept of "Bring Your Own Language", Cloud Foundry allows a developer to write an application using *almost* any language you like.
+Using the concept of "Bring Your Own Language", Cloud Foundry allows a developer to write an application using ***almost any*** language.
 
 <!-- *********************************************************************** -->
 <a name="overview"></a>
 ## Cloud Foundry's "Bring Your own Language" Concept
 
-Java is most certainly one of the most popular development languages at the moment; however, Cloud Foundry offers developers the opportunity to create their own applications using almost ***any*** programming language.
+Java is most certainly one of the most popular development languages at the moment; however, Cloud Foundry offers developers the opportunity to create their own applications using ***almost any*** programming language.
 
 The only factors constraining your choice of language are:
 
