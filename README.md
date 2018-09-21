@@ -1,19 +1,9 @@
-# cloud-cf-byol-weather-sample
+# Weather Sample: Using Cloud Foundry's BYOL Concept
 
 <!-- *********************************************************************** -->
 <a name="contents"></a>
-## Table of Contents
-1. [Overview](#overview)
-1. [Description](#description)
-1. [Requirements](#requirements)
-1. [Download & Installation](#download)
-1. [Configuration](#configuration)
-1. [Limitations](#limitations)
-1. [Known Issues](#issues)
-1. [Support and Contributing](#support)
-1. [Authors](#authors)
-1. [License](#license)
 
+Using the concept of "Bring Your Own Language", Cloud Foundry allows a developer to write an application using *almost* any language you like.
 
 <!-- *********************************************************************** -->
 <a name="overview"></a>
@@ -56,7 +46,6 @@ Detailed documentation for GeoServer can be found [here](./geo_server/README.md)
 The client-side part is written in Scala and compiled to JavaScript using the [Scala.js](https://www.scala-js.org) cross-compiler.  Since the cross-compilation process creates a static JavaScript file, this part of the demo can be deployed to Cloud Foundry using the standard Staticfile buildpack.
 
 Detailed documentation for Weather Report can be found [here](./weather_report/README.md).
-
 
 
 
