@@ -68,9 +68,25 @@ class WeatherReportBuilder(data: js.Dynamic) {
   val clouds = data.clouds.all.asInstanceOf[Int]
   traceInfo(s"Cloud cover         = $clouds")
 
-  // Optional 3 hour rain and snow fall information
-  val rain = if (data.rain == null || data.rain.toString == "undefined") 0.0 else data.rain.`3h`.asInstanceOf[Double]
-  val snow = if (data.snow == null || data.snow.toString == "undefined") 0.0 else data.snow.`3h`.asInstanceOf[Double]
+  // Optional 1 or 3 hour rainfall information
+  val rain =
+    if (data.rain == null || data.rain.toString == "undefined")
+      0.0
+    else if (data.rain.`1h` == null || data.rain.`1h`.toString == "undefined")
+      if (data.rain.`3h` == null || data.rain.`3h`.toString == "undefined")
+        0.0
+      else
+        data.rain.`3h`.asInstanceOf[Double]
+    else
+      data.rain.`1h`.asInstanceOf[Double]
+
+  // Optional snowfall information
+  val snow =
+    if (data.snow == null || data.snow.toString == "undefined")
+      0.0
+    else
+      data.snow.`3h`.asInstanceOf[Double]
+
   traceInfo(s"Rain                = $rain")
   traceInfo(s"Snow                = $snow")
 

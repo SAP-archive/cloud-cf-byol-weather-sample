@@ -8,7 +8,6 @@ import org.scalajs.dom.{Event, Node, document, html}
 import scala.collection.mutable.{ListBuffer, Map}
 import scala.scalajs.js
 
-
 /***********************************************************************************************************************
   * Utilities for accessing and manipulating the DOM
   */
@@ -147,11 +146,9 @@ object DOMUtils {
   def createOption(city: City): Option = {
     var opt = createElement[Option]("option")
 
-    // The admin 1 2 and 3 text fields for a city could be null
-    opt.text = city.name +
-      (if (city.admin3Txt != null) s", ${city.admin3Txt}" else "") +
-      (if (city.admin2Txt != null) s", ${city.admin2Txt}" else "") +
-      (if (city.admin1Txt != null) s", ${city.admin1Txt}" else "")
+    // Build the full city name (the admin3 text is not considered)
+    opt.text = Utils.formatFullName(city)
+
 
     opt.setAttribute("lat", city.lat.toString)
     opt.setAttribute("lng", city.lng.toString)
@@ -322,12 +319,10 @@ object DOMUtils {
    */
   def buildWeatherReport(w: WeatherReportBuilder): Unit = {
     val fnName = "buildWeatherReport"
+    val fullName = Utils.formatFullName()
+
     trace(fnName, enter)
-    traceInfo(fnName, s"Building weather report for " +
-      s"${StageManager.thisCity}, " +
-      s"${StageManager.thisAdmin2}, " +
-      s"${StageManager.thisAdmin1}, " +
-      s"${CountryList.getName(StageManager.thisCountryIso)}")
+    traceInfo(fnName, s"Building weather report for " + fullName)
 
     showElement[Div](MessageBox.weatherReportDiv)
 
@@ -337,12 +332,7 @@ object DOMUtils {
     var tbody = tab.createTBody()
     var rows  = ListBuffer[Map[String,String]]()
 
-    val captionTxt =
-        "Weather for " +
-        Utils.textListFirstItem(StageManager.thisCity) +
-        Utils.textListItem(StageManager.thisAdmin2) +
-        Utils.textListItem(StageManager.thisAdmin1) +
-        Utils.textListItem(CountryList.getName(StageManager.thisCountryIso))
+    val captionTxt = "Weather for " + fullName
 
     tab.appendChild(createTableCaption(captionTxt))
 

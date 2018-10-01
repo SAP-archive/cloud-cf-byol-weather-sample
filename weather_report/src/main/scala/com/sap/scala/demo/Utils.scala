@@ -6,6 +6,7 @@ import org.scalajs.dom
 import scala.scalajs.js
 import scala.util.Try
 
+
 /***********************************************************************************************************************
   * General purpose utilities
   */
@@ -87,10 +88,6 @@ object Utils {
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  // Various string formatting functions
-  def textListFirstItem(str: String): String = if (str != "null" && str.size > 0) str       else ""
-  def textListItem(str: String):      String = if (str != "null" && str.size > 0) s", $str" else ""
-
   // All temperatures are returned in Kelvin
   def kelvinToDegStr(k: Double, min: Double, max: Double):String = {
     val variation = (max - min) / 2
@@ -120,6 +117,29 @@ object Utils {
     h + s"˚ (${compassPoints(Math.max(upper,lower))})"
   }
 
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // Create the city or town's full name string from either the StageManager object (once a city has been selected) or
+  // from a City object (when building the dropdown list of search results)
+  def formatFullName(): String =
+    formatFullName_int(StageManager.thisCity,
+                       StageManager.thisAdmin1,
+                       StageManager.thisAdmin2,
+                       StageManager.thisCountryIso)
+
+  def formatFullName(city: City): String =
+    formatFullName_int(city.name,
+                       city.admin1Txt,
+                       city.admin2Txt,
+                       city.countryCode)
+
+  private def formatFullName_int(cityName: String, adm1: String, adm2: String, countryISO: String): String =
+    cityName +
+      (if (adm2 == null || adm2 == cityName) "" else ", " + adm2) +
+      (if (adm1 == null) "" else ", " + adm1) +
+      ", " +
+      CountryList.getName(countryISO)
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // Add the appropriate unit string after various values
   def formatVisibility(v: Int): String    = v + "m"
   def formatVelocity(v: Double): String   = v + "m/s"
@@ -159,8 +179,8 @@ object Utils {
     weatherEndpoint + queryStr
   }
 
-//  private val geoserver_url = "http://localhost:8080/search"
-  private val geoserver_url = "https://geo-server.cfapps.us10.hana.ondemand.com/search"
+  private val geoserver_url = "http://localhost:8080/search"
+//  private val geoserver_url = "https://geo-server.cfapps.us10.hana.ondemand.com/search"
 
   def buildSearchUrl(search_term: String, whole_word: Boolean, starts_with: Boolean): String =
     s"$geoserver_url?search_term=$search_term&whole_word=$whole_word&starts_with=$starts_with"
